@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+  <comment>
+    <![CDATA[{
+  "comment": "{\n  \"comment\": \"\",\n  \"returnType\": {\n    \"type\": \"Any\",\n    \"description\": \"\"\n  },\n  \"bundle\": null,\n  \"javadoc\": {\n    \"type\": \"BlockComment\",\n    \"value\": \"\\n@return {Any}\",\n    \"range\": [\n      0,\n      24\n    ],\n    \"loc\": {\n      \"start\": {\n        \"line\": 1,\n        \"column\": 0\n      },\n      \"end\": {\n        \"line\": 3,\n        \"column\": 3\n      }\n    },\n    \"codeStart\": null,\n    \"raw\": \"*\\n * @return {Any}\\n \",\n    \"code\": {\n      \"context\": {},\n      \"value\": \"(function () {\",\n      \"range\": [\n        25,\n        39\n      ],\n      \"loc\": {\n        \"start\": {\n          \"line\": 4,\n          \"column\": 0\n        },\n        \"end\": {\n          \"line\": 4,\n          \"column\": 14\n        }\n      }\n    },\n    \"description\": \"\",\n    \"footer\": \"\",\n    \"examples\": [],\n    \"tags\": [\n      {\n        \"title\": \"return\",\n        \"name\": \"\",\n        \"description\": \"\",\n        \"type\": {\n          \"type\": \"NameExpression\",\n          \"name\": \"Any\"\n        }\n      }\n    ]\n  },\n  \"crc\": \"3290bfc7\"\n}",
+  "returnType": {
+    "type": "Any",
+    "description": ""
+  },
+  "javadoc": "\n@return {Any}",
+  "crc": "327dab48"
+}]]>
+  </comment>
+  <entry key="categoryPath">com.vmware.pscoe.test.actions</entry>
+  <entry key="name">sample</entry>
+  <entry key="type">ScriptModule</entry>
+  <entry key="id">f915c966-1ff6-4be8-a4a1-e82a03081e1f</entry>
+</properties>

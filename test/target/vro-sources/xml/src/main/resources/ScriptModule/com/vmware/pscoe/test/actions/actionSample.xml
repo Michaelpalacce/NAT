@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?><dunes-script-module name="actionSample" result-type="number" api-version="6.0.0" id="e027e63c-2f16-422e-9cae-c0a11adc882d" version="1.0.0" allowed-operations="vef"><description><![CDATA[]]></description><param n="a" t="number"><![CDATA[]]></param><param n="b" t="number"><![CDATA[]]></param><script encoded="false"><![CDATA[return a + b;
+]]></script></dunes-script-module>

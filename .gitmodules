@@ -1,0 +1,3 @@
+[submodule "btva"]
+	path = btva
+	url = https://github.com/vmware/build-tools-for-vmware-aria.git

@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="utf-8" ?><config-element id="a6c8e74e-3946-365a-9068-caae0b63237a" version="1.0.0"><display-name><![CDATA[Sample Config]]></display-name><atts><att name="field1" type="string" read-only="false" /><att name="field2" type="number" read-only="false" /><att name="field3" type="Any" read-only="false" /></atts></config-element>

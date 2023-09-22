@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+  <comment>
+    <![CDATA[{
+  "comment": "{\n  \"comment\": \"\",\n  \"returnType\": {\n    \"type\": \"number\",\n    \"description\": \"\"\n  },\n  \"bundle\": null,\n  \"javadoc\": {\n    \"type\": \"BlockComment\",\n    \"value\": \"\\n@param {number} a\\n@param {number} b\\n\\n@return {number}\",\n    \"range\": [\n      122,\n      194\n    ],\n    \"loc\": {\n      \"start\": {\n        \"line\": 10,\n        \"column\": 0\n      },\n      \"end\": {\n        \"line\": 15,\n        \"column\": 3\n      }\n    },\n    \"codeStart\": null,\n    \"raw\": \"*\\n * @param {number} a\\n * @param {number} b\\n *\\n * @return {number}\\n \",\n    \"code\": {\n      \"context\": {},\n      \"value\": \"(function (a, b) {\",\n      \"range\": [\n        195,\n        213\n      ],\n      \"loc\": {\n        \"start\": {\n          \"line\": 16,\n          \"column\": 0\n        },\n        \"end\": {\n          \"line\": 16,\n          \"column\": 18\n        }\n      }\n    },\n    \"description\": \"\",\n    \"footer\": \"\",\n    \"examples\": [],\n    \"tags\": [\n      {\n        \"title\": \"param\",\n        \"name\": \"a\",\n        \"description\": \"\",\n        \"type\": {\n          \"type\": \"NameExpression\",\n          \"name\": \"number\"\n        }\n      },\n      {\n        \"title\": \"param\",\n        \"name\": \"b\",\n        \"description\": \"\",\n        \"type\": {\n          \"type\": \"NameExpression\",\n          \"name\": \"number\"\n        }\n      },\n      {\n        \"title\": \"return\",\n        \"name\": \"\",\n        \"description\": \"\",\n        \"type\": {\n          \"type\": \"NameExpression\",\n          \"name\": \"number\"\n        }\n      }\n    ]\n  },\n  \"crc\": \"40ac0a2d\"\n}",
+  "returnType": {
+    "type": "number",
+    "description": ""
+  },
+  "javadoc": "\n@param {number} a\n@param {number} b\n\n@return {number}",
+  "crc": "1c7bc5bd"
+}]]>
+  </comment>
+  <entry key="categoryPath">com.vmware.pscoe.test.actions</entry>
+  <entry key="name">actionSample</entry>
+  <entry key="type">ScriptModule</entry>
+  <entry key="id">e027e63c-2f16-422e-9cae-c0a11adc882d</entry>
+</properties>
