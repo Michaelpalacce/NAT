@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "NAT stands for  - NodeJS - Aria - Tools",
   "main": "src/index.ts",
+  "type": "module",
+  "bin": "src/index.js",
   "directories": {
     "test": "test"
   },
