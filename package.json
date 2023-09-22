@@ -13,7 +13,9 @@
     "lodash.camelcase": "^4.3.0",
     "typical": "^4.0.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@types/node": "^20.6.3"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
