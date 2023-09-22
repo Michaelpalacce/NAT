@@ -5,6 +5,15 @@ NAT stands for
 - Aria
 - Tools
 
+## Improvements
+
+- [ ] Better Certificate Handling
+- [ ] Better vrotsc/vropkg installation
+- [ ] Pushing code
+- [ ] More Customizability regarding inputs
+- [ ] Download dependencies
+- [ ] Don't rely on initial mvn clean package
+
 ## Development
 
 ### Setting Up BTVA Dependencies
@@ -20,3 +29,15 @@ cd ../vropkg
 npm link
 ```
 
+### Setting Version To Latest Release
+
+Modify the pom.xml in the btva folder and make sure to set the revision to the latest release version
+
+## Troubleshooting
+
+### vrotsc and vropkg building issues..
+
+- Remove tests... 
+- Install extra dependencies
+- Run `npm i` manually and see what happens.. 
+- Run the commands manually and see what happens
