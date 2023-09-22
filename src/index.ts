@@ -1,3 +1,5 @@
+import { execa } from "execa";
+
 const commandLineArgs = require('command-line-args');
 const optionDefinitions = [
 	{ name: 'verbose', alias: 'v', type: Boolean },
@@ -14,7 +16,14 @@ console.log(options);
 /pscoe/test, --mapsOut, target/vro-sources/map/com/vmware/pscoe/test, --actionsOut, target/vro-sources/js/src/main/resources/com/vmware/pscoe/test, --testHelpersOut, target/vro-sources/testHelpers/src/main/resources/com/vmware/pscoe/test, --workflowsOu
 t, target/vro-sources/xml/src/main/resources/Workflow, --policiesOut, target/vro-sources/xml/src/main/resources/PolicyTemplate, --resourcesOut, target/vro-sources/xml/src/main/resources/ResourceElement, --configsOut, target/vro-sources/xml/src/main/res
 ources/ConfigurationElement]
-	*/
+*/
+
+const process = execa('vrotsc', ['src', '--actionsNamespace', 'com.vmware.pscoe.test', '--workflowsNamespace', 'test', '--files',
+	'--typesOut', 'target/vro-types', '--testsOut', 'target/vro-sources/test/com/vmware/pscoe/test',
+	'--mapsOut', 'target/vro-sources/map/com/vmware/pscoe/test', '--actionsOut', 'target/vro-sources/js/src/main/resources/com/vmware/pscoe/test',
+	'--testHelpersOut', 'target/vro-sources/testHelpers/src/main/resources/com/vmware/pscoe/test', '--workflowsOut',
+	'target/vro-sources/xml/src/main/resources/Workflow', '--policiesOut', 'target/vro-sources/xml/src/main/resources/PolicyTemplate', '--resourcesOut',
+	'target/vro-sources/xml/src/main/resources/ResourceElement', '--configsOut', 'target/vro-sources/xml/src/main/resources/ConfigurationElement']);
 
 
 //VROPKG
