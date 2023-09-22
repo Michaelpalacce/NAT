@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><dunes-script-module name="sample" result-type="Any" api-version="6.0.0" id="f915c966-1ff6-4be8-a4a1-e82a03081e1f" version="1.0.0" allowed-operations="vef"><description><![CDATA[]]></description><script encoded="false"><![CDATA[var exports = {};
+<?xml version="1.0" encoding="UTF-8"?><dunes-script-module name="sample" result-type="Any" api-version="6.0.0" id="87482d95-8c48-4c39-a6ce-c293a18599ba" version="1.0.0" allowed-operations="vef"><description><![CDATA[]]></description><script encoded="false"><![CDATA[var exports = {};
 /*-
  * #%L
  * test
