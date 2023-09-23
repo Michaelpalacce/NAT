@@ -3,7 +3,7 @@ import { mkdir, rm } from "fs/promises";
 import targz from "targz";
 import { promisify } from "util";
 import { join } from 'path';
-import { getHomedir } from './helpers/fs/locations.js';
+import { getNatConfigDir } from './helpers/fs/locations.js';
 import { CliOptions } from './arguments.js';
 import logger from './logger/logger.js';
 import { existsSync } from 'fs';
@@ -17,7 +17,7 @@ const decompress = promisify(targz.decompress);
 export async function initDependencies(args: CliOptions) {
 	const { btvaVersion } = args;
 
-	const natFolder = join(getHomedir(), ".nat",);
+	const natFolder = getNatConfigDir();
 	const vropkgModule = join(natFolder, 'vropkg');
 	const vrotscModule = join(natFolder, 'vrotsc');
 
