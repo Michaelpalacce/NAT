@@ -5,40 +5,42 @@ NAT stands for
 - Aria
 - Tools
 
+## Usage
+
+### First Run
+
+Running
+```bash
+nat --init
+```
+Will install vrotsc and vropkg globally for you... you can specify different version of btva by passing --btvaVersion=2.35.0
+
+### General
+
+```
+nat
+```
+This will be all you need... it will do mvn clean package if the target folder does not exists, since for now it still depends on it for certificates and
+dependencies
+
 ## Improvements
 
 - [ ] Better Certificate Handling
-- [ ] Better vrotsc/vropkg installation
+- [x] Better vrotsc/vropkg installation
 - [ ] Pushing code
-- [ ] More Customizability regarding inputs
+- [x] More Customizability regarding inputs
 - [ ] Download dependencies
 - [ ] Don't rely on initial mvn clean package
-- [ ] Convert information about the artifact to a special lock file.
+- [x] Convert information about the artifact to a special lock file.
 
 ## Development
 
 ### Setting Up BTVA Dependencies
 
-We need to npm link both vrotsc and vropkg. 
-
-`npm link` allows us to use the local modules without pushing them to npm.
+You need to run
 
 ```bash
-cd ./btva/typescript/vrotsc
-npm link 
-cd ../vropkg
-npm link
+nat --init
 ```
+once before you start using nat.. this is global.
 
-### Setting Version To Latest Release
-
-Modify the pom.xml in the btva folder and make sure to set the revision to the latest release version
-
-## Troubleshooting
-
-### vrotsc and vropkg building issues..
-
-- Remove tests... 
-- Install extra dependencies
-- Run `npm i` manually and see what happens.. 
-- Run the commands manually and see what happens
