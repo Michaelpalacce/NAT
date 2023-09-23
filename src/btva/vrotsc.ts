@@ -1,6 +1,7 @@
 import { execa } from "execa";
 import { ArtifactData } from "../helpers/maven/artifact.js";
 import { CliOptions } from "../arguments.js";
+import logger from "../logger/logger.js";
 
 /**
 * This will run vrotsc, it will transpile the code to js
@@ -9,7 +10,7 @@ export default async function(args: CliOptions, artifactData: ArtifactData) {
 	const { outFolder } = args;
 	const { artifactId, groupId } = artifactData;
 
-	console.log("Running vrotsc");
+	logger.info(`Running vrotsc.`);
 	await execa('vrotsc', [
 		'src',
 		'--actionsNamespace', `${groupId}.${artifactId}`,
@@ -25,5 +26,5 @@ export default async function(args: CliOptions, artifactData: ArtifactData) {
 		'--resourcesOut', `${outFolder}/vro-sources/xml/src/main/resources/ResourceElement`,
 		'--configsOut', `${outFolder}/vro-sources/xml/src/main/resources/ConfigurationElement`
 	]);
-	console.log("Finished vrotsc");
+	logger.info(`Finished running vrotsc.`);
 }
