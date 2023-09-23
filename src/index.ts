@@ -10,14 +10,18 @@ import { ensurePackage } from './helpers/maven/mvn.js';
 import logger from './logger/logger.js';
 import { CliOptions } from './arguments.js';
 import { initDependencies } from './init.js';
+import { getSettingsXmlLocation } from './helpers/fs/locations.js';
 
 const args = parse<CliOptions>(
 	{
 		outFolder: { type: String, defaultValue: "NAT", description: "Where to output the generated `.package` file as well as other build artifacts" },
-		clean: { type: Boolean, defaultValue: false, description: "TEMPORARY: Runs `mvn clean package` once to ensure that the target folder exists, so we have dependencies + certificates" },
 		help: { type: Boolean, defaultValue: false, alias: "h", description: "Displays Help" },
 		init: { type: Boolean, defaultValue: false, description: "Initialize NAT dependencies, downloads vrotsc and vropkg from maven central" },
-		btvaVersion: { type: String, defaultValue: "2.35.0", description: "Specifies the btva version we should use when it's needed" }
+
+		btvaVersion: { type: String, defaultValue: "2.35.0", description: "TEMPORARY: Specifies the btva version we should use when it's needed" },
+		clean: { type: Boolean, defaultValue: false, description: "TEMPORARY: Runs `mvn clean package` once to ensure that the target folder exists, so we have dependencies + certificates" },
+		settingsXmlLocation: { type: String, defaultValue: getSettingsXmlLocation(), description: "TEMPORARY: Specify the settings.xml location so we can read the settings already in place" },
+		packagingProfileId: { type: String, defaultValue: "packaging", description: "TEMPORARY: Specify the packaging profile id so we can fetch data from it" }
 	},
 	{
 		helpArg: 'help',

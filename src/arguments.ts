@@ -3,5 +3,7 @@ export interface CliOptions {
 	clean: boolean,
 	init: boolean,
 	btvaVersion: string,
-	help: boolean;
+	help: boolean,
+	settingsXmlLocation: string,
+	packagingProfileId: string;
 }

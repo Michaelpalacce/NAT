@@ -9,11 +9,12 @@
 		"test": "test"
 	},
 	"dependencies": {
-		"@types/targz": "^1.0.2",
-		"@types/winston": "^2.4.4",
+		"@types/decompress": "^4.2.5",
 		"array-back": "^3.1.0",
 		"command-line-args": "^5.2.1",
+		"decompress": "^4.2.1",
 		"execa": "^8.0.1",
+		"fast-xml-parser": "^4.3.0",
 		"find-replace": "^3.0.0",
 		"lodash.camelcase": "^4.3.0",
 		"mvn-artifact-download": "^6.1.1",
@@ -24,7 +25,9 @@
 		"winston": "^3.10.0"
 	},
 	"devDependencies": {
-		"@types/node": "^20.6.3"
+		"@types/node": "^20.6.3",
+		"@types/targz": "^1.0.2",
+		"@types/winston": "^2.4.4"
 	},
 	"scripts": {
 		"local": "tsc && npm link",
