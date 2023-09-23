@@ -1,10 +1,12 @@
 import { execa } from "execa";
 import { ArtifactData } from "../helpers/maven/artifact.js";
+import { CliOptions } from "../arguments.js";
 
 /**
 * This will run vrotsc, it will transpile the code to js
 */
-export default async function(outFolder: string, artifactData: ArtifactData) {
+export default async function(args: CliOptions, artifactData: ArtifactData) {
+	const { outFolder } = args;
 	const { artifactId, groupId } = artifactData;
 
 	console.log("Running vrotsc");

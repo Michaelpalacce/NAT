@@ -8,12 +8,14 @@ import ensureDirClean from './helpers/fs/ensureDirClean.js';
 import { ArtifactData, fetchArtifactData } from './helpers/maven/artifact.js';
 import { ensurePackage } from './helpers/maven/mvn.js';
 import logger from './logger/logger.js';
+import { CliOptions } from './arguments.js';
 
-const args = parse({
+const args = parse<CliOptions>({
 	outFolder: { type: String, defaultValue: "NAT", description: "Where to output the generated `.package` file as well as other build artifacts" },
 	clean: { type: Boolean, defaultValue: false, description: "TEMPORARY: Runs `mvn clean package` once to ensure that the target folder exists, so we have dependencies + certificates" },
-	help: { type: Boolean, defaultValue: false, alias: "h", description: "WIP: Displays Help" },
-	init: { type: Boolean, defaultValue: false, description: "Initialize NAT dependencies, downloads vrotsc and vropkg from maven central" }
+	help: { type: Boolean, defaultValue: false, alias: "h", description: "Displays Help" },
+	init: { type: Boolean, defaultValue: false, description: "Initialize NAT dependencies, downloads vrotsc and vropkg from maven central" },
+	btvaVersion: { type: String, defaultValue: "2.35.0", description: "Specifies the btva version we should use when it's needed" }
 },
 	{
 		helpArg: 'help',
@@ -22,11 +24,16 @@ const args = parse({
 	},
 );
 
-
 const start = Date.now();
 const cwd = process.cwd();
 
 const outFolder = join(cwd, args.outFolder);
+
+if (args.init) {
+
+	logger.info("Successfully set up vrotsc and vropkg");
+	process.exit(0);
+}
 
 // Fetches artifact data, stores it in a lock file and returns it. Alternatively if the lock file exists, fetches it from there
 const artifactData: ArtifactData = await fetchArtifactData(cwd);
@@ -36,8 +43,8 @@ await ensurePackage(cwd, args.clean);
 // Clears out the outDirectory
 ensureDirClean(outFolder);
 // Runs vrotsc to transpile TS code
-await vrotsc(outFolder, artifactData);
+await vrotsc(args, artifactData);
 // Runs vropkg to create the .package file
-await vropkg(outFolder, artifactData);
+await vropkg(args, artifactData);
 
 logger.info(`Elapsed time generating package: ${(Date.now() - start) / 1000}s`);
