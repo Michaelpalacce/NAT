@@ -22,3 +22,13 @@ export function getSettingsXmlLocation() {
 export function getNatConfigDir() {
 	return join(getHomedir(), ".nat");
 }
+
+/**
+* Gets the location to the pre-extracted certificates
+*/
+export function getCertificates() {
+	return {
+		privateKeyPem: join(getNatConfigDir(), 'keystore', 'private_key.pem'),
+		certPem: join(getNatConfigDir(), 'keystore', 'cert.pem')
+	};
+}

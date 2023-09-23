@@ -2,6 +2,7 @@ import { execa } from "execa";
 import { ArtifactData } from "../helpers/maven/artifact.js";
 import { CliOptions } from "../arguments.js";
 import logger from "../logger/logger.js";
+import { getCertificates } from "../helpers/fs/locations.js";
 
 /**
 * This method runs both vropkg tree and flat. This will package the entire solution to a .package file
@@ -18,8 +19,8 @@ export default async function(args: CliOptions, artifactData: ArtifactData) {
 		'--srcPath', `${outFolder}/vro-sources/js`,
 		'--out', 'tree',
 		'--destPath', `${outFolder}/vro-sources/xml`,
-		'--privateKeyPEM', `target/keystore.example-${args.btvaVersion}/private_key.pem`,
-		'--certificatesPEM', `target/keystore.example-${args.btvaVersion}/cert.pem`,
+		'--privateKeyPEM', getCertificates().privateKeyPem,
+		'--certificatesPEM', getCertificates().certPem,
 		'--keyPass', 'VMware1!',
 		'--version', version,
 		'--packaging', 'package',
@@ -35,8 +36,8 @@ export default async function(args: CliOptions, artifactData: ArtifactData) {
 		'--srcPath', `${outFolder}/vro-sources/xml`,
 		'--out', 'flat',
 		'--destPath', `${outFolder}/vropkg`,
-		'--privateKeyPEM', `target/keystore.example-${args.btvaVersion}/private_key.pem`,
-		'--certificatesPEM', `target/keystore.example-${args.btvaVersion}/cert.pem`,
+		'--privateKeyPEM', getCertificates().privateKeyPem,
+		'--certificatesPEM', getCertificates().certPem,
 		'--keyPass', 'VMware1!',
 		'--version', version,
 		'--packaging', 'package',

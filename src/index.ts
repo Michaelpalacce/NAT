@@ -9,7 +9,7 @@ import { ArtifactData, fetchArtifactData } from './helpers/maven/artifact.js';
 import { ensurePackage } from './helpers/maven/mvn.js';
 import logger from './logger/logger.js';
 import { CliOptions } from './arguments.js';
-import { initDependencies } from './init.js';
+import { initCertificates, initDependencies, resetNatFolder } from './init.js';
 import { getSettingsXmlLocation } from './helpers/fs/locations.js';
 
 const args = parse<CliOptions>(
@@ -36,7 +36,9 @@ const cwd = process.cwd();
 const outFolder = join(cwd, args.outFolder);
 
 if (args.init) {
+	await resetNatFolder();
 	await initDependencies(args);
+	await initCertificates(args);
 	logger.info("Successfully set up vrotsc and vropkg, you can now run nat anywhere");
 	process.exit(0);
 }

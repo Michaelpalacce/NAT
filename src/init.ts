@@ -1,5 +1,5 @@
 import download from 'mvn-artifact-download';
-import { mkdir, readFile, rm } from "fs/promises";
+import { mkdir, readFile, rename, rm } from "fs/promises";
 import targz from "targz";
 import { promisify } from "util";
 import { join } from 'path';
@@ -24,14 +24,25 @@ export async function getPackagingProfile(args: CliOptions) {
 	return packagingProfile;
 }
 
+export async function resetNatFolder() {
+	const natFolder = getNatConfigDir();
+
+	if (existsSync(natFolder))
+		await rm(natFolder, { recursive: true });
+
+	await mkdir(natFolder);
+}
+
+/**
+* Fetches the certificates based on artifactId and groupId and extracts them to the nat subdir... 
+* @TODO: Make it work with local certificates
+*/
 export async function initCertificates(args: CliOptions) {
 	logger.info("Fetching certificates based on settings.xml");
 	const packagingProfile = await getPackagingProfile(args);
 
 	const natFolder = getNatConfigDir();
 	const keystoreModule = join(natFolder, 'keystore');
-
-	console.log(packagingProfile);
 
 	const keystoreLocation = await download.default(
 		{
@@ -45,6 +56,18 @@ export async function initCertificates(args: CliOptions) {
 
 	await decompress(keystoreLocation, keystoreModule);
 
+	const keystoreSubDir = `${packagingProfile.properties.keystoreArtifactId}-${packagingProfile.properties.keystoreVersion}`;
+	await rename(
+		join(keystoreModule, keystoreSubDir, 'cert.pem'),
+		join(keystoreModule, 'cert.pem')
+	);
+
+	await rename(
+		join(keystoreModule, keystoreSubDir, 'private_key.pem'),
+		join(keystoreModule, 'private_key.pem')
+	);
+
+	await rm(join(keystoreModule, keystoreSubDir));
 	logger.info("Done fetching certificates based on settings.xml");
 }
 
@@ -52,9 +75,6 @@ export async function initCertificates(args: CliOptions) {
 * Will download vrotsc and vropkg to your home directory and npm link them
 */
 export async function initDependencies(args: CliOptions) {
-	await initCertificates(args);
-
-	throw "HARD STOP";
 	const { btvaVersion } = args;
 
 	const natFolder = getNatConfigDir();
@@ -62,11 +82,6 @@ export async function initDependencies(args: CliOptions) {
 	const vrotscModule = join(natFolder, 'vrotsc');
 
 	logger.info(`Setting up vrotsc and vropkg in ${natFolder}`);
-
-	if (existsSync(natFolder))
-		await rm(natFolder, { recursive: true });
-
-	await mkdir(natFolder);
 
 	logger.debug("Downloading vrotsc and vropkg");
 	const vrotscLocation = await download.default(
@@ -103,6 +118,7 @@ export async function initDependencies(args: CliOptions) {
 	logger.debug("Running npm link fro vrotsc and vropkg");
 	await execa('npm', ['link'], { cwd: join(vrotscModule, 'package') });
 	await execa('npm', ['link'], { cwd: join(vropkgModule, 'package') });
+
 
 	logger.info("Done setting up vrotsc and vropkg");
 }
