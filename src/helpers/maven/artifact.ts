@@ -8,6 +8,7 @@ import logger from "../../logger/logger.js";
 const parsePom = promisify(pomParser.parse);
 const artifactLockFileName = 'nat.lock';
 
+//@TODO FINISH ME WHEN WE GET THERE
 export interface Dependency {
 
 }

@@ -9,6 +9,7 @@
 		"test": "test"
 	},
 	"dependencies": {
+		"@types/targz": "^1.0.2",
 		"@types/winston": "^2.4.4",
 		"array-back": "^3.1.0",
 		"command-line-args": "^5.2.1",
@@ -17,6 +18,7 @@
 		"lodash.camelcase": "^4.3.0",
 		"mvn-artifact-download": "^6.1.1",
 		"pom-parser": "^1.2.0",
+		"targz": "^1.0.1",
 		"ts-command-line-args": "^2.5.1",
 		"typical": "^4.0.0",
 		"winston": "^3.10.0"

@@ -9,6 +9,7 @@ import { ArtifactData, fetchArtifactData } from './helpers/maven/artifact.js';
 import { ensurePackage } from './helpers/maven/mvn.js';
 import logger from './logger/logger.js';
 import { CliOptions } from './arguments.js';
+import { initDependencies } from './init.js';
 
 const args = parse<CliOptions>({
 	outFolder: { type: String, defaultValue: "NAT", description: "Where to output the generated `.package` file as well as other build artifacts" },
@@ -30,7 +31,7 @@ const cwd = process.cwd();
 const outFolder = join(cwd, args.outFolder);
 
 if (args.init) {
-
+	await initDependencies(args);
 	logger.info("Successfully set up vrotsc and vropkg");
 	process.exit(0);
 }

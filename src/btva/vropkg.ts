@@ -10,7 +10,6 @@ export default async function(args: CliOptions, artifactData: ArtifactData) {
 	const { outFolder } = args;
 	const { artifactId, groupId, version } = artifactData;
 
-
 	console.log("Generating vropkg tree");
 	await execa('vropkg', [
 		'--in',
