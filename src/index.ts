@@ -23,12 +23,12 @@ const outFolder = join(cwd, args.outFolder);
 const artifactData: ArtifactData = await fetchArtifactData(cwd);
 
 // Ensures we run mvn clean package if the target dir does not exist.
-ensurePackage(cwd, args.clean);
+await ensurePackage(cwd, args.clean);
 // Clears out the outDirectory
 ensureDirClean(outFolder);
 // Runs vrotsc to transpile TS code
-vrotsc(outFolder, artifactData);
+await vrotsc(outFolder, artifactData);
 // Runs vropkg to create the .package file
-vropkg(outFolder, artifactData);
+await vropkg(outFolder, artifactData);
 
 logger.info(`Elapsed time generating package: ${(Date.now() - start) / 1000}s`);

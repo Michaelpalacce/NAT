@@ -1,6 +1,5 @@
 import { execa } from "execa";
 import { existsSync } from "fs";
-import { rm } from "fs/promises";
 import { join } from "path";
 
 /**
@@ -9,10 +8,7 @@ import { join } from "path";
 */
 export async function ensurePackage(containingDir: string, force: boolean): Promise<void> {
 	const targetFolder = join(containingDir, "target");
-	if (force)
-		await rm(targetFolder, { recursive: true });
-
-	if (!existsSync(targetFolder)) {
+	if (!existsSync(targetFolder) || force) {
 		await execa('mvn', ['clean', 'package']);
 	}
 }
