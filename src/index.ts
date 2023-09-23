@@ -12,7 +12,8 @@ import logger from './logger/logger.js';
 const args = parse({
 	outFolder: { type: String, defaultValue: "NAT", description: "Where to output the generated `.package` file as well as other build artifacts" },
 	clean: { type: Boolean, defaultValue: false, description: "TEMPORARY: Runs `mvn clean package` once to ensure that the target folder exists, so we have dependencies + certificates" },
-	help: { type: Boolean, defaultValue: false, alias: "h", description: "WIP: Displays Help" }
+	help: { type: Boolean, defaultValue: false, alias: "h", description: "WIP: Displays Help" },
+	init: { type: Boolean, defaultValue: false, description: "Initialize NAT dependencies, downloads vrotsc and vropkg from maven central" }
 },
 	{
 		helpArg: 'help',
