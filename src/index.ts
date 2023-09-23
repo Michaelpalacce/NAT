@@ -10,9 +10,17 @@ import { ensurePackage } from './helpers/maven/mvn.js';
 import logger from './logger/logger.js';
 
 const args = parse({
-	outFolder: { type: String, defaultValue: "NAT" },
-	clean: { type: Boolean, defaultValue: false, description: "TEMPORARY: Runs `mvn clean package` once to ensure that the target folder exists, so we have dependencies + certificates" }
-});
+	outFolder: { type: String, defaultValue: "NAT", description: "Where to output the generated `.package` file as well as other build artifacts" },
+	clean: { type: Boolean, defaultValue: false, description: "TEMPORARY: Runs `mvn clean package` once to ensure that the target folder exists, so we have dependencies + certificates" },
+	help: { type: Boolean, defaultValue: false, alias: "h", description: "WIP: Displays Help" }
+},
+	{
+		helpArg: 'help',
+		headerContentSections: [{ header: 'NodeJS Aria Tools', content: 'If it breaks, blame Stefan Genov' }],
+		footerContentSections: [{ header: 'License', content: `Copyright: WIP` }],
+	},
+);
+
 
 const start = Date.now();
 const cwd = process.cwd();
