@@ -13,6 +13,7 @@ NAT stands for
 - [ ] More Customizability regarding inputs
 - [ ] Download dependencies
 - [ ] Don't rely on initial mvn clean package
+- [ ] Convert information about the artifact to a special lock file.
 
 ## Development
 

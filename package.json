@@ -9,6 +9,7 @@
 		"test": "test"
 	},
 	"dependencies": {
+		"@types/winston": "^2.4.4",
 		"array-back": "^3.1.0",
 		"command-line-args": "^5.2.1",
 		"execa": "^8.0.1",
@@ -16,7 +17,8 @@
 		"lodash.camelcase": "^4.3.0",
 		"pom-parser": "^1.2.0",
 		"ts-command-line-args": "^2.5.1",
-		"typical": "^4.0.0"
+		"typical": "^4.0.0",
+		"winston": "^3.10.0"
 	},
 	"devDependencies": {
 		"@types/node": "^20.6.3"

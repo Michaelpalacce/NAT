@@ -5,12 +5,12 @@ import { ArtifactData } from "../helpers/maven/artifact.js";
 * This will run vrotsc, it will transpile the code to js
 */
 export default async function(outFolder: string, artifactData: ArtifactData) {
-	const { artifactId, fullArtifact } = artifactData;
+	const { artifactId, groupId } = artifactData;
 
 	console.log("Running vrotsc");
 	await execa('vrotsc', [
 		'src',
-		'--actionsNamespace', fullArtifact,
+		'--actionsNamespace', `${groupId}.${artifactId}`,
 		'--workflowsNamespace', artifactId,
 		'--files',
 		'--typesOut', `${outFolder}/vro-types`,

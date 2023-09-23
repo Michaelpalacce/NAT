@@ -1,0 +1,6 @@
+{
+    "artifactId": "test",
+    "groupId": "com.vmware.pscoe",
+    "version": "1.0.0-SNAPSHOT",
+    "dependencies": []
+}

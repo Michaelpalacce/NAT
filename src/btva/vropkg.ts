@@ -1,5 +1,5 @@
 import { execa } from "execa";
-import { ArtifactData } from "../artifact.js";
+import { ArtifactData } from "../helpers/maven/artifact.js";
 
 /**
 * This method runs both vropkg tree and flat. This will package the entire solution to a .package file

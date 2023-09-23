@@ -1,21 +1,58 @@
 import { promisify } from "util";
-var pomParser = require("pom-parser");
+import pomParser from "pom-parser";
+import { join } from "path";
+import { existsSync } from "fs";
+import { readFile, writeFile } from "fs/promises";
+import logger from "../../logger/logger.js";
 const parsePom = promisify(pomParser.parse);
+const artifactLockFileName = 'nat.lock';
 /**
- * Implement me
+* Checks and reads the lock file
+*/
+export async function readLockFile(lockFileLocation) {
+    const hasLock = existsSync(lockFileLocation);
+    return hasLock ? (await readFile(lockFileLocation)).toString() : null;
+}
+/**
+ * Utilizes the pom parser node module to extract details from the pom.
+ * Will Create a lock file with the details extracted and that lock file will be read in the future instead.
+ * This is done to minimize the overhead of converting the code
  */
-export async function fetchArtifactData(pomPath) {
-    const pomResponse = await parsePom({
-        filePath: pomPath
-    });
-    // The original pom xml that was loaded is provided.
-    console.log("XML: " + pomResponse.pomXml);
-    // The parsed pom pbject.
-    console.log("OBJECT: " + JSON.stringify(pomResponse.pomObject));
-    return {
-        fullArtifact: 'com.vwmare.pscoe.test',
-        artifactId: "test",
-        groupId: "com.vwmare.pscoe",
-        version: "1.0.0-SNAPSHOT",
-    };
+export async function fetchArtifactData(containingDir) {
+    logger.info("Fetching artifact data");
+    const lockFileLocation = join(containingDir, artifactLockFileName);
+    const lockData = await readLockFile(lockFileLocation);
+    let artifact;
+    if (lockData) {
+        try {
+            artifact = JSON.parse(lockData);
+            logger.debug(`Discovered existing artifact from ${artifactLockFileName}: ${JSON.stringify(artifact, null, 4)}`);
+        }
+        catch (e) {
+            throw new Error(`Error while trying to parse the data retrieved from ${lockFileLocation}, check that the format is correct. Error was: ${e}`);
+        }
+    }
+    else {
+        logger.debug(`No ${artifactLockFileName} found, trying to parse the pom.xml`);
+        let pomResponse;
+        try {
+            pomResponse = await parsePom({
+                filePath: join(containingDir, "pom.xml")
+            });
+        }
+        catch (e) {
+            throw new Error(`No ${artifactLockFileName} found in ${containingDir} and pom.xml was not parsed successfully. Error was: ${e}`);
+        }
+        const project = pomResponse.pomObject.project;
+        artifact = {
+            artifactId: project.artifactid,
+            groupId: project.groupid,
+            version: project.version,
+            dependencies: []
+        };
+        logger.debug(`Extracted ArtifactData: ${JSON.stringify(artifact, null, 4)}`);
+        await writeFile(lockFileLocation, JSON.stringify(artifact, null, 4));
+    }
+    logger.info("Done fetching artifact data");
+    return artifact;
 }
