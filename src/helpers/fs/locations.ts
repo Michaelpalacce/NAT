@@ -1,4 +1,8 @@
+
 // @TODO MOVE ALL Locations here :)
+
+import { homedir } from "os";
+
 export function getHomedir() {
-	return require('os').homedir();
+	return homedir();
 }

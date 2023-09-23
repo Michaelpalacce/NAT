@@ -18,8 +18,6 @@ export async function initDependencies(args: CliOptions) {
 	const { btvaVersion } = args;
 
 	const natFolder = join(getHomedir(), ".nat",);
-	const vrotscLocation = join(natFolder, 'vrotsc.tgz');
-	const vropkgLocation = join(natFolder, 'vropkg.tgz');
 	const vropkgModule = join(natFolder, 'vropkg');
 	const vrotscModule = join(natFolder, 'vrotsc');
 
@@ -31,8 +29,24 @@ export async function initDependencies(args: CliOptions) {
 	await mkdir(natFolder);
 
 	logger.debug("Downloading vrotsc and vropkg");
-	await download.default(`com.vmware.pscoe.iac:vrotsc${btvaVersion}`, vrotscLocation);
-	await download.default(`com.vmware.pscoe.iac:vropkg${btvaVersion}`, vropkgLocation);
+	const vrotscLocation = await download.default(
+		{
+			artifactId: 'vrotsc',
+			groupId: "com.vmware.pscoe.iac",
+			version: btvaVersion,
+			extension: 'tgz'
+		},
+		natFolder
+	);
+	const vropkgLocation = await download.default(
+		{
+			artifactId: "vropkg",
+			groupId: "com.vmware.pscoe.iac",
+			version: btvaVersion,
+			extension: "tgz"
+		},
+		natFolder
+	);
 
 	logger.debug("Decompressing vropkg and vrotsc");
 	// decompress files from tar.gz archive
@@ -47,8 +61,8 @@ export async function initDependencies(args: CliOptions) {
 	});
 
 	logger.debug("Running npm link fro vrotsc and vropkg");
-	await execa('npm', ['link'], { cwd: vrotscModule });
-	await execa('npm', ['link'], { cwd: vropkgModule });
+	await execa('npm', ['link'], { cwd: join(vrotscModule, 'package') });
+	await execa('npm', ['link'], { cwd: join(vropkgModule, 'package') });
 
 	logger.info("Done setting up vrotsc and vropkg");
 }
