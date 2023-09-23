@@ -1,6 +1,5 @@
 import { execa } from "execa";
-import { ArtifactData } from "../artifact.js";
-
+import { ArtifactData } from "../helpers/maven/artifact.js";
 
 /**
 * This will run vrotsc, it will transpile the code to js
