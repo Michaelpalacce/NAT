@@ -44,6 +44,7 @@ dependencies
 - [ ] Definitions? 
 - [ ] Save Artifact in memory so we don't read it twice
 - [ ] Don't rely on vrotsc and vropkg from maven central
+- [ ] Improve vrotsc and vropkg. Realistically I can rewrite them to depreciate support for vro 7 which will improve them significantly.
 
 ## Development
 
