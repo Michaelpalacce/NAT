@@ -4,6 +4,10 @@
 import { homedir } from "os";
 import { join } from "path";
 
+export const PRIVATE_KEY_PEM_NAME = 'private_key.pem';
+export const CERT_PEM_NAME = 'cert.pem';
+
+
 export function getHomedir() {
 	return homedir();
 }
@@ -24,11 +28,18 @@ export function getNatConfigDir() {
 }
 
 /**
+* Location where the keystore is stored
+*/
+export function getKeystoreDir() {
+	return join(getNatConfigDir(), "keystore");
+}
+
+/**
 * Gets the location to the pre-extracted certificates
 */
 export function getCertificates() {
 	return {
-		privateKeyPem: join(getNatConfigDir(), 'keystore', 'private_key.pem'),
-		certPem: join(getNatConfigDir(), 'keystore', 'cert.pem')
+		privateKeyPem: join(getKeystoreDir(), PRIVATE_KEY_PEM_NAME),
+		certPem: join(getKeystoreDir(), CERT_PEM_NAME)
 	};
 }

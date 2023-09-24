@@ -6,22 +6,22 @@ import vropkg from "./btva/vropkg.js";
 import vrotsc from "./btva/vrotsc.js";
 import ensureDirClean from './helpers/fs/ensureDirClean.js';
 import { ArtifactData, fetchArtifactData } from './helpers/maven/artifact.js';
-import { ensurePackage } from './helpers/maven/mvn.js';
 import logger from './logger/logger.js';
 import { CliOptions } from './arguments.js';
 import { initCertificates, initDependencies, resetNatFolder } from './init.js';
-import { getSettingsXmlLocation } from './helpers/fs/locations.js';
+import { getHomedir, getSettingsXmlLocation } from './helpers/fs/locations.js';
 
 const args = parse<CliOptions>(
 	{
-		outFolder: { type: String, defaultValue: "NAT", description: "Where to output the generated `.package` file as well as other build artifacts" },
+		outFolder: { type: String, defaultValue: "NAT", description: "Where to output the generated `.package` file as well as other build artifacts. Default: NAT" },
+
 		help: { type: Boolean, defaultValue: false, alias: "h", description: "Displays Help" },
+
 		init: { type: Boolean, defaultValue: false, description: "Initialize NAT dependencies, downloads vrotsc and vropkg from maven central" },
+		keystoreLocation: { type: String, defaultValue: join(getHomedir(), ".m2", "keystore"), description: "Init: Holds the location to the keystore folder. Must contain a cert.pem and a private_key.pem. Default: ~/.m2/keystore" },
 
 		btvaVersion: { type: String, defaultValue: "2.35.0", description: "TEMPORARY: Specifies the btva version we should use when it's needed" },
-		clean: { type: Boolean, defaultValue: false, description: "TEMPORARY: Runs `mvn clean package` once to ensure that the target folder exists, so we have dependencies + certificates" },
-		settingsXmlLocation: { type: String, defaultValue: getSettingsXmlLocation(), description: "TEMPORARY: Specify the settings.xml location so we can read the settings already in place" },
-		packagingProfileId: { type: String, defaultValue: "packaging", description: "TEMPORARY: Specify the packaging profile id so we can fetch data from it" }
+		clean: { type: Boolean, defaultValue: false, description: "TEMPORARY: Runs `mvn clean package` once to ensure that the target folder exists, so we have dependencies + type definitions" }
 	},
 	{
 		helpArg: 'help',
@@ -35,19 +35,18 @@ const cwd = process.cwd();
 
 const outFolder = join(cwd, args.outFolder);
 
-if (args.init) {
-	await resetNatFolder();
-	await initDependencies(args);
-	await initCertificates(args);
-	logger.info("Successfully set up vrotsc and vropkg, you can now run nat anywhere");
-	process.exit(0);
+switch (true) {
+	case args.init:
+		logger.info("Initializing NAT");
+		await resetNatFolder();
+		await initDependencies(args);
+		await initCertificates(args);
+		logger.info("Successfully initialized");
+		process.exit(0);
 }
 
 // Fetches artifact data, stores it in a lock file and returns it. Alternatively if the lock file exists, fetches it from there
 const artifactData: ArtifactData = await fetchArtifactData(cwd);
-
-// Ensures we run mvn clean package if the target dir does not exist.
-await ensurePackage(cwd, args.clean);
 // Clears out the outDirectory
 ensureDirClean(outFolder);
 // Runs vrotsc to transpile TS code
