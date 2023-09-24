@@ -10,6 +10,7 @@ export default async function(args: CliOptions, artifactData: ArtifactData) {
 	const { outFolder } = args;
 	const { artifactId, groupId } = artifactData;
 
+	const start = Date.now();
 	logger.info(`Running vrotsc.`);
 	await execa('vrotsc', [
 		'src',
@@ -26,5 +27,5 @@ export default async function(args: CliOptions, artifactData: ArtifactData) {
 		'--resourcesOut', `${outFolder}/vro-sources/xml/src/main/resources/ResourceElement`,
 		'--configsOut', `${outFolder}/vro-sources/xml/src/main/resources/ConfigurationElement`
 	]);
-	logger.info(`Finished running vrotsc.`);
+	logger.info(`Finished running vrotsc. Took: ${(Date.now() - start)/1000}s`);
 }
