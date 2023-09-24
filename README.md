@@ -38,8 +38,10 @@ dependencies
 - [x] More Customizability regarding inputs
 - [x] Don't rely on initial mvn clean package
 - [x] Convert information about the artifact to a special lock file.
-- [ ] Pushing code
-- [ ] Download dependencies
+- [ ] Pushing code - Alpha
+- [ ] Improve Push Code Logic
+- [ ] Download dependencies and push them
+- [ ] Definitions? 
 - [ ] Don't rely on vrotsc and vropkg from maven central
 
 ## Development
