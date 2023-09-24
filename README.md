@@ -9,6 +9,8 @@ NAT stands for
 
 ### First Run
 
+Make sure to download the certificates locally.
+
 Running
 ```bash
 nat --init

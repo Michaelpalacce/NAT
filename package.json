@@ -4,7 +4,7 @@
 	"description": "NAT stands for  - NodeJS - Aria - Tools",
 	"main": "src/index.ts",
 	"type": "module",
-	"bin": "src/index.js",
+	"bin": "dist/index.js",
 	"directories": {
 		"test": "test"
 	},
