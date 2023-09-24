@@ -25,12 +25,13 @@ dependencies
 
 ## Improvements
 
-- [ ] Better Certificate Handling
+- [ ] Better Certificate Handling. Certificates should only work with local paths.
+- [ ] Better cleaning of the .nat folder. Only delete specific things inside.
 - [x] Better vrotsc/vropkg installation
 - [ ] Pushing code
 - [x] More Customizability regarding inputs
 - [ ] Download dependencies
-- [ ] Don't rely on initial mvn clean package
+- [x] Don't rely on initial mvn clean package
 - [x] Convert information about the artifact to a special lock file.
 
 ## Development
