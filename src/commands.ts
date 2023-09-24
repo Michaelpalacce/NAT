@@ -28,7 +28,7 @@ export async function initCmd(args: CliOptions) {
 /**
 * Packages the current working dir to a .package
 */
-export async function packageCmd(args: CliOptions) {
+export async function buildCmd(args: CliOptions) {
 	const cwd = process.cwd();
 	const outFolder = join(cwd, args.outFolder);
 

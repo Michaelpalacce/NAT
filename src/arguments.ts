@@ -8,7 +8,7 @@ export interface CliOptions {
 	keystoreLocation: string,
 
 	init: boolean,
-	package: boolean,
+	build: boolean,
 	push: boolean,
 	addConnection: boolean;
 	deleteConnection: boolean;
@@ -32,10 +32,10 @@ export function parseArguments() {
 			help: { type: Boolean, defaultValue: false, alias: "h", description: "Displays Help" },
 
 			init: { type: Boolean, defaultValue: false, description: "Initialize NAT dependencies, downloads vrotsc and vropkg from maven central" },
-			package: { type: Boolean, defaultValue: true, description: "Prepares a package that can be pushed" },
+			build: { type: Boolean, defaultValue: false, alias: "b", description: "Prepares a package that can be pushed" },
+			push: { type: Boolean, defaultValue: false, alias: "p", description: "WIP: Pushes the prepared package" },
 			addConnection: { type: Boolean, defaultValue: false, description: "Adds a new Aria connection" },
 			deleteConnection: { type: Boolean, defaultValue: false, description: "WIP: Deletes an existing Aria connection" },
-			push: { type: Boolean, defaultValue: true, description: "WIP: Pushes the prepared package" },
 
 			btvaVersion: { type: String, defaultValue: DEFAULT_BTVA_VERSION, description: "TEMPORARY: Specifies the btva version we should use when it's needed" },
 			clean: { type: Boolean, defaultValue: false, description: "TEMPORARY: Runs `mvn clean package` once to ensure that the target folder exists, so we have dependencies + type definitions" }

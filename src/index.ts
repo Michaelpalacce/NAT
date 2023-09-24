@@ -2,7 +2,7 @@
 import axios from "axios";
 import { parseArguments } from "./arguments.js";
 import LoginClient from "./clients/aria/LoginClient.js";
-import { initCmd, packageCmd } from "./commands.js";
+import { initCmd, buildCmd } from "./commands.js";
 import { addConnection } from "./nat/connection.js";
 import { join } from "path";
 import FormData from 'form-data';
@@ -18,16 +18,14 @@ const args = parseArguments();
 
 if (args.init) {
 	await initCmd(args);
-	process.exit(0);
 }
 
 if (args.addConnection) {
 	await addConnection(args);
-	process.exit(0);
 }
 
-if (args.package) {
-	await packageCmd(args);
+if (args.build) {
+	await buildCmd(args);
 }
 
 if (args.push) {
