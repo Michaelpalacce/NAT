@@ -1,6 +1,6 @@
 import inquirer, { InputQuestion } from "inquirer";
 import { CliOptions } from "../arguments.js";
-import { mkdir, readdir, rm, writeFile } from "fs/promises";
+import { readFile, readdir, rm, writeFile } from "fs/promises";
 import { getConnectionsDir } from "../helpers/fs/locations.js";
 import { join } from "path";
 import { existsSync } from "fs";
@@ -28,7 +28,7 @@ const questions: InputQuestion[] = [
 		name: "url",
 		type: "input",
 		message: "FQDN : ",
-		default: "vra-l-01.corp.local"
+		default: "vra-l-01a.corp.local"
 	},
 	{
 		name: "port",
@@ -90,6 +90,13 @@ export async function deleteConnection(connectionName: string) {
 		await rm(getConnectionPath(connectionName), { recursive: true });
 }
 
+export async function getConnection(connectionName: string): Promise<Connection> {
+	if (hasConnection(connectionName))
+		return JSON.parse((await readFile(getConnectionPath(connectionName))).toString());
+
+	throw new Error(`Connection ${connectionName} does not exist. Possible connections: ${(await getConnections()).join(',')}`);
+}
+
 /**
 * This will prompt you for the connection details and save it given the name.
 * If you already have one called the same name, it will be overwritten
@@ -99,6 +106,6 @@ export async function addConnection(args: CliOptions) {
 	const answer = await inquirer.prompt(questions);
 	await ensureDirExists(getConnectionsDir());
 	await deleteConnection(answer.name);
-	await writeFile(getConnectionPath(answer.name), JSON.stringify(answer));
+	await writeFile(getConnectionPath(answer.name), JSON.stringify(answer, null, 4));
 	logger.info(`Connection (${answer.name}) successfully added`);
 }

@@ -11,6 +11,7 @@ export interface CliOptions {
 	package: boolean,
 	push: boolean,
 	addConnection: boolean;
+	deleteConnection: boolean;
 
 	btvaVersion: string,
 	clean: boolean,
@@ -31,8 +32,9 @@ export function parseArguments() {
 			help: { type: Boolean, defaultValue: false, alias: "h", description: "Displays Help" },
 
 			init: { type: Boolean, defaultValue: false, description: "Initialize NAT dependencies, downloads vrotsc and vropkg from maven central" },
-			addConnection: { type: Boolean, defaultValue: false, description: "Adds a new Aria connection" },
 			package: { type: Boolean, defaultValue: true, description: "Prepares a package that can be pushed" },
+			addConnection: { type: Boolean, defaultValue: false, description: "Adds a new Aria connection" },
+			deleteConnection: { type: Boolean, defaultValue: false, description: "WIP: Deletes an existing Aria connection" },
 			push: { type: Boolean, defaultValue: true, description: "WIP: Pushes the prepared package" },
 
 			btvaVersion: { type: String, defaultValue: DEFAULT_BTVA_VERSION, description: "TEMPORARY: Specifies the btva version we should use when it's needed" },
