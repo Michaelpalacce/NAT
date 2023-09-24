@@ -10,6 +10,7 @@ NAT stands for
 ### First Run
 
 Make sure to download the certificates locally.
+After that, create 
 
 Running
 ```bash
@@ -40,10 +41,6 @@ dependencies
 
 ### Setting Up BTVA Dependencies
 
-You need to run
-
-```bash
-nat --init
-```
-once before you start using nat.. this is global.
-
+- Follow the instructrions for the first run.
+- run `npm run dev` in one terminal first
+- run `tsc --watch` in one terminal and keep it running
