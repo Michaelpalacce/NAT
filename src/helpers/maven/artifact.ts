@@ -33,6 +33,7 @@ export async function readLockFile(lockFileLocation: string): Promise<string | n
  * Utilizes the pom parser node module to extract details from the pom.
  * Will Create a lock file with the details extracted and that lock file will be read in the future instead.
  * This is done to minimize the overhead of converting the code
+ * @TODO Save this once fetched in memory?
  */
 export async function fetchArtifactData(containingDir: string): Promise<ArtifactData> {
 	logger.info("Fetching artifact data");

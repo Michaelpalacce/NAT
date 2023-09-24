@@ -42,6 +42,7 @@ dependencies
 - [ ] Improve Push Code Logic
 - [ ] Download dependencies and push them
 - [ ] Definitions? 
+- [ ] Save Artifact in memory so we don't read it twice
 - [ ] Don't rely on vrotsc and vropkg from maven central
 
 ## Development
