@@ -35,6 +35,13 @@ export function getKeystoreDir() {
 }
 
 /**
+* This is where all the connections are stored
+*/
+export function getConnectionsDir() {
+	return join(getNatConfigDir(), 'connections');
+}
+
+/**
 * Gets the location to the pre-extracted certificates
 */
 export function getCertificates() {

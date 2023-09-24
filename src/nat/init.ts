@@ -8,6 +8,7 @@ import { CliOptions } from '../arguments.js';
 import logger from '../logger/logger.js';
 import { existsSync } from 'fs';
 import { execa } from 'execa';
+import ensureDirExists from '../helpers/fs/ensureDirExists.js';
 const untar = promisify(targz.decompress);
 
 /**
@@ -16,11 +17,16 @@ const untar = promisify(targz.decompress);
 export async function resetNatFolder() {
 	const natFolder = getNatConfigDir();
 
-	if (existsSync(natFolder))
-		await rm(natFolder, { recursive: true });
+	await Promise.all(['vrotsc', 'vropkg', 'keystore'].map(folder => new Promise<void>(async (resolve) => {
+		const toDelete = join(natFolder, folder);
+		if (existsSync(toDelete))
+			await rm(toDelete, { recursive: true });
 
-	await mkdir(natFolder);
+		await mkdir(toDelete, { recursive: true });
+		resolve();
+	})));
 }
+
 
 /**
 * Sets the certificates for vropkg to use. They must be present on the FS.
@@ -48,7 +54,7 @@ export async function initCertificates(args: CliOptions) {
 
 	logger.debug(`Copying certificates to ${keystoreModule}`);
 
-	await mkdir(keystoreModule);
+	await ensureDirExists(keystoreModule);
 
 	await copyFile(certLocation, getCertificates().certPem);
 	await copyFile(privateKeyLocation, getCertificates().privateKeyPem);
@@ -69,15 +75,6 @@ export async function initDependencies(args: CliOptions) {
 	logger.info(`Setting up vrotsc and vropkg in ${natFolder}`);
 
 	logger.debug("Downloading vrotsc and vropkg");
-	const vrotscLocation = await download.default(
-		{
-			artifactId: 'vrotsc',
-			groupId: "com.vmware.pscoe.iac",
-			version: btvaVersion,
-			extension: 'tgz'
-		},
-		natFolder
-	);
 	const vropkgLocation = await download.default(
 		{
 			artifactId: "vropkg",
@@ -88,6 +85,18 @@ export async function initDependencies(args: CliOptions) {
 		natFolder
 	);
 
+	logger.debug(`Downloaded vropkg to ${vropkgLocation}`);
+	const vrotscLocation = await download.default(
+		{
+			artifactId: 'vrotsc',
+			groupId: "com.vmware.pscoe.iac",
+			version: btvaVersion,
+			extension: 'tgz'
+		},
+		natFolder
+	);
+
+	logger.debug(`Downloaded vrotsc to ${vrotscLocation}`);
 	logger.debug("Decompressing vropkg and vrotsc");
 	// decompress files from tar.gz archive
 	await untar({
@@ -101,9 +110,9 @@ export async function initDependencies(args: CliOptions) {
 	});
 
 	logger.debug("Running npm link for vrotsc and vropkg");
+
 	await execa('npm', ['link'], { cwd: join(vrotscModule, 'package') });
 	await execa('npm', ['link'], { cwd: join(vropkgModule, 'package') });
-
 
 	logger.info("Done setting up vrotsc and vropkg");
 }

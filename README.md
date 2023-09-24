@@ -5,6 +5,11 @@ NAT stands for
 - Aria
 - Tools
 
+## Requirements
+
+- NodeJS 16
+- 
+
 ## Usage
 
 ### First Run
