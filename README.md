@@ -8,7 +8,6 @@ NAT stands for
 ## Requirements
 
 - NodeJS 16
-- 
 
 ## Usage
 
@@ -37,6 +36,8 @@ dependencies
 - [x] Better vrotsc/vropkg installation
 - [x] More Customizability regarding inputs
 - [x] Don't rely on initial mvn clean package
+- [x] Building Code
+- [x] Compiling Code
 - [x] Convert information about the artifact to a special lock file.
 - [ ] Pushing code - Alpha
 - [ ] Improve Push Code Logic
@@ -44,8 +45,8 @@ dependencies
 - [ ] Definitions? 
 - [ ] Save Artifact in memory so we don't read it twice
 - [ ] Don't rely on vrotsc and vropkg from maven central
-- [ ] Improve vrotsc and vropkg. Realistically I can rewrite them to depreciate support for vro 7 which will improve them significantly. Also think about incremental updates... Saving a file somewhere with what was already generated may be beneficial? 
-- [ ] Tests
+- [ ] Improve vrotsc and vropkg. Realistically I can rewrite them to depreciate support for vro 7 which will improve them significantly. Improve I/O may lead to significant improvements.
+- [ ] Running Tests
 
 ## Development
 
