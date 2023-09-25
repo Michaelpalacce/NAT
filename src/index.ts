@@ -9,7 +9,7 @@ import FormData from 'form-data';
 import { createReadStream } from "fs";
 import { ArtifactData, fetchArtifactData } from "./helpers/maven/artifact.js";
 import logger from "./logger/logger.js";
-import inquirer, { InputQuestion } from "inquirer";
+import inquirer from "inquirer";
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
@@ -32,6 +32,7 @@ if (args.build) {
 if (args.push) {
 	//WIP
 	const connections = await getConnections();
+
 	if (connections.length === 0) {
 		throw new Error("Trying to push to Aria Orhcestrator, but no connections have been added. Run `nat --addConnection` first");
 	}
@@ -39,7 +40,7 @@ if (args.push) {
 	const answers = await inquirer.prompt([
 		{
 			name: "connection",
-			type: "input",
+			type: "list",
 			message: "Connection To Use: ",
 			choices: connections,
 			default: connections[0]
