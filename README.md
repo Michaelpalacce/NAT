@@ -39,6 +39,8 @@ dependencies
 - [x] Building Code
 - [x] Compiling Code
 - [x] Convert information about the artifact to a special lock file.
+- [ ] Introduce a fast mode... Essentially separate config elements from the rest, so we can delete the package before hand with all of it's content and
+  re-import it
 - [ ] Pushing code - Alpha
 - [ ] Improve Push Code Logic
 - [ ] Download dependencies and push them
