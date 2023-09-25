@@ -1,6 +1,6 @@
 {
-	"name": "nat",
-	"version": "1.0.0",
+	"name": "node-aria-tools",
+	"version": "1.0.1",
 	"description": "NAT stands for  - NodeJS - Aria - Tools",
 	"main": "src/index.ts",
 	"type": "module",

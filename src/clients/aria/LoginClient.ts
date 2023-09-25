@@ -11,6 +11,10 @@ export default class LoginClient {
 	constructor(private configuration: Configuration) {
 	}
 
+	public getConfig(): Configuration {
+		return this.configuration;
+	}
+
 	static async fromConnection(connectionName: string): Promise<LoginClient> {
 		return new LoginClient(new Configuration(await getConnection(connectionName)));
 	}

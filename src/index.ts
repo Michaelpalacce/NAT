@@ -3,7 +3,7 @@ import axios from "axios";
 import { parseArguments } from "./arguments.js";
 import LoginClient from "./clients/aria/LoginClient.js";
 import { initCmd, buildCmd } from "./commands.js";
-import { addConnection, getConnections } from "./nat/connection.js";
+import { addConnection, getConnections, hasConnection } from "./nat/connection.js";
 import { join } from "path";
 import FormData from 'form-data';
 import { createReadStream } from "fs";
@@ -31,23 +31,30 @@ if (args.build) {
 
 if (args.push) {
 	//WIP
-	const connections = await getConnections();
+	let connection = args.connection;
+	const connectionExists = await hasConnection(connection);
+	if (!connection || !connectionExists) {
+		logger.info("No connection specified, prompting.");
+		const connections = await getConnections();
 
-	if (connections.length === 0) {
-		throw new Error("Trying to push to Aria Orhcestrator, but no connections have been added. Run `nat --addConnection` first");
+		if (connections.length === 0) {
+			throw new Error("Trying to push to Aria Orhcestrator, but no connections have been added. Run `nat --addConnection` first");
+		}
+
+		const answers = await inquirer.prompt([
+			{
+				name: "connection",
+				type: "list",
+				message: "Connection To Use: ",
+				choices: connections,
+				default: connections[0]
+			}
+		]);
+
+		connection = answers.connection;
 	}
 
-	const answers = await inquirer.prompt([
-		{
-			name: "connection",
-			type: "list",
-			message: "Connection To Use: ",
-			choices: connections,
-			default: connections[0]
-		}
-	]);
-
-	const loginClient = await LoginClient.fromConnection(answers.connection);
+	const loginClient = await LoginClient.fromConnection(connection);
 	loginClient.setLoginInterceptorInInstance();
 
 	const artifactData: ArtifactData = await fetchArtifactData(process.cwd());
@@ -60,7 +67,7 @@ if (args.push) {
 	const location = join(process.cwd(), args.outFolder, 'vropkg', packageName);
 	form.append('file', createReadStream(location), packageName);
 	logger.debug(`Going to upload: ${location}`);
-	const response = await axios.post('https://vra-l-01a.corp.local/vco/api/packages?overwrite=true', form, { headers: form.getHeaders() }).catch(e => e);
+	const response = await axios.post(`https://${loginClient.getConfig().getUrl()}/vco/api/packages?overwrite=true`, form, { headers: form.getHeaders() }).catch(e => e);
 	console.log(response.data);
 	logger.info(`${packageName} uploaded`);
 	logger.info(`Total time: ${(Date.now() - start) / 1000}s`);
