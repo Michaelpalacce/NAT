@@ -3,12 +3,13 @@ import axios from "axios";
 import { parseArguments } from "./arguments.js";
 import LoginClient from "./clients/aria/LoginClient.js";
 import { initCmd, buildCmd } from "./commands.js";
-import { addConnection } from "./nat/connection.js";
+import { addConnection, getConnections } from "./nat/connection.js";
 import { join } from "path";
 import FormData from 'form-data';
 import { createReadStream } from "fs";
 import { ArtifactData, fetchArtifactData } from "./helpers/maven/artifact.js";
 import logger from "./logger/logger.js";
+import inquirer, { InputQuestion } from "inquirer";
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
@@ -30,7 +31,22 @@ if (args.build) {
 
 if (args.push) {
 	//WIP
-	const loginClient = await LoginClient.fromConnection('Aria');
+	const connections = await getConnections();
+	if (connections.length === 0) {
+		throw new Error("Trying to push to Aria Orhcestrator, but no connections have been added. Run `nat --addConnection` first");
+	}
+
+	const answers = await inquirer.prompt([
+		{
+			name: "connection",
+			type: "input",
+			message: "Connection To Use: ",
+			choices: connections,
+			default: connections[0]
+		}
+	]);
+
+	const loginClient = await LoginClient.fromConnection(answers.connection);
 	loginClient.setLoginInterceptorInInstance();
 
 	const artifactData: ArtifactData = await fetchArtifactData(process.cwd());

@@ -13,7 +13,7 @@ NAT stands for
 
 ### First Run
 
-Make sure to download the certificates locally.
+Make sure to download the certificates locally. Paste them in ~/.m2/keystore. You must have a `cert.pem` and a `private_key.pem`.
 After that, create 
 
 Running
@@ -25,7 +25,7 @@ Will install vrotsc and vropkg globally for you... you can specify different ver
 ### General
 
 ```
-nat
+nat -b -p
 ```
 This will be all you need... it will do mvn clean package if the target folder does not exists, since for now it still depends on it for certificates and
 dependencies

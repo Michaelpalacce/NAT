@@ -43,7 +43,7 @@ export function parseArguments() {
 		{
 			helpArg: 'help',
 			headerContentSections: [{ header: 'NodeJS Aria Tools', content: 'If it breaks, blame Stefan Genov' }],
-			footerContentSections: [{ header: 'License', content: `Copyright: ` }],
+			footerContentSections: [{ header: 'License', content: `Copyright: Beer` }],
 		}
 	);
 }

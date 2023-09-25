@@ -71,21 +71,21 @@ function getConnectionPath(connectionName: string): string {
 /**
 * Checks if a connection exists
 */
-export function hasConnection(connectionName: string) {
+export function hasConnection(connectionName: string): boolean {
 	return existsSync(getConnectionPath(connectionName));
 }
 
 /**
 * Gets all the stored connections
 */
-export async function getConnections() {
-	return await readdir(getConnectionsDir());
+export async function getConnections(): Promise<string[]> {
+	return (await readdir(getConnectionsDir())).map(c => c.substring(0, c.length - 5));
 }
 
 /**
 * Deletes the given connection if it exists
 */
-export async function deleteConnection(connectionName: string) {
+export async function deleteConnection(connectionName: string): Promise<void> {
 	if (hasConnection(connectionName))
 		await rm(getConnectionPath(connectionName), { recursive: true });
 }
@@ -101,7 +101,7 @@ export async function getConnection(connectionName: string): Promise<Connection>
 * This will prompt you for the connection details and save it given the name.
 * If you already have one called the same name, it will be overwritten
 */
-export async function addConnection(args: CliOptions) {
+export async function addConnection(args: CliOptions): Promise<void> {
 	logger.info(`Adding a new connection`);
 	const answer = await inquirer.prompt(questions);
 	await ensureDirExists(getConnectionsDir());
