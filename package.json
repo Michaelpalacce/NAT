@@ -1,10 +1,12 @@
 {
 	"name": "node-aria-tools",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "NAT stands for  - NodeJS - Aria - Tools",
 	"main": "src/index.ts",
 	"type": "module",
-	"bin": "dist/index.js",
+	"bin": {
+		"nat": "dist/index.js"
+	},
 	"directories": {
 		"test": "test"
 	},
@@ -27,8 +29,8 @@
 		"winston": "^3.10.0"
 	},
 	"devDependencies": {
-		"@types/inquirer": "^9.0.3",
 		"@types/decompress": "^4.2.5",
+		"@types/inquirer": "^9.0.3",
 		"@types/node": "^20.6.3",
 		"@types/targz": "^1.0.2",
 		"ts-node": "^10.9.1",
