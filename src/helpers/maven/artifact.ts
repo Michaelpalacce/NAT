@@ -23,6 +23,13 @@ export interface ArtifactData {
 }
 
 /**
+* Forms the package name following BTVA's naming standard
+*/
+export function getPackageNameFromArtifactData(artifactData: ArtifactData) {
+	return `${artifactData.groupId}.${artifactData.artifactId}-${artifactData.version}.package`;
+}
+
+/**
 * Checks and reads the lock file
 */
 export async function readLockFile(lockFileLocation: string): Promise<string | null> {
@@ -35,7 +42,7 @@ export async function readLockFile(lockFileLocation: string): Promise<string | n
  * Utilizes the pom parser node module to extract details from the pom.
  * Will Create a lock file with the details extracted and that lock file will be read in the future instead.
  * This is done to minimize the overhead of converting the code
- * @TODO Save this once fetched in memory?
+ * After fetching the artifact once, we'll save the data in memory and use that instead to speed up the process. You can disable this by passing force = true
  */
 export async function fetchArtifactData(containingDir: string, force: boolean = false): Promise<ArtifactData> {
 	logger.info("Fetching artifact data");
