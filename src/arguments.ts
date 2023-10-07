@@ -18,8 +18,8 @@ export interface CliOptions {
 	clean: boolean,
 }
 
-export const DEFAULT_OUT_FOLDER = "NAT";
-export const DEFAULT_BTVA_VERSION = '2.35.0';
+export const DEFAULT_OUT_FOLDER = 'NAT';
+export const DEFAULT_BTVA_VERSION = '2.35.1';
 
 /**
 * Parses the process.argv arguments based on the options provided
@@ -39,12 +39,15 @@ export function parseArguments() {
 			addConnection: { type: Boolean, defaultValue: false, description: "Adds a new Aria connection" },
 			deleteConnection: { type: Boolean, defaultValue: false, description: "WIP: Deletes an existing Aria connection" },
 
-			btvaVersion: { type: String, defaultValue: DEFAULT_BTVA_VERSION, description: "TEMPORARY: Specifies the btva version we should use when it's needed" },
+			btvaVersion: { type: String, defaultValue: DEFAULT_BTVA_VERSION, description: "Specifies the btva version to use when initializing vropkg and vrotsc" },
 			clean: { type: Boolean, defaultValue: false, description: "TEMPORARY: Runs `mvn clean package` once to ensure that the target folder exists, so we have dependencies + type definitions" }
 		},
 		{
 			helpArg: 'help',
-			headerContentSections: [{ header: 'NodeJS Aria Tools', content: 'If it breaks, blame Stefan Genov' }],
+			headerContentSections: [
+				{ header: 'NodeJS Aria Tools', content: 'A cli helper to save us all from mvn. Aimed ONLY at pushing typescript code to Orchestrator which is what is most commonly used for.' },
+				{ header: 'Support', content: '.If it breaks, blame Stefan Genov' }
+			],
 			footerContentSections: [{ header: 'License', content: `Copyright: Beer` }],
 		}
 	);
