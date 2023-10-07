@@ -1,5 +1,5 @@
 import { parseArguments } from "./arguments.js";
-import { initCmd, buildCmd, pushCmd } from "./commands.js";
+import { initCmd, buildCmd, pushCmd, addConnectionCmd } from "./commands.js";
 import logger from "./logger/logger.js";
 
 /**
@@ -15,6 +15,7 @@ export default async function() {
 	}
 
 	if (args.addConnection) {
+		await addConnectionCmd(args);
 	}
 
 	if (args.build) {
