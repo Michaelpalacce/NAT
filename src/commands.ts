@@ -1,14 +1,14 @@
 import { join } from "path";
 import { CliOptions } from "./arguments.js";
 import { initCertificates, initDependencies, resetNatFolder } from "./nat/init.js";
-import logger from "./logger/logger.js";
-import { ArtifactData, fetchArtifactData } from "./helpers/maven/artifact.js";
 import ensureDirClean from "./helpers/fs/ensureDirClean.js";
 import vrotsc from "./btva/vrotsc.js";
 import vropkg from "./btva/vropkg.js";
 import { existsSync } from "fs";
 import { getConnectionsDir } from "./helpers/fs/locations.js";
 import { addConnection } from "./nat/connection.js";
+import { ArtifactData, fetchArtifactData } from "./helpers/maven/artifact.js";
+import logger from "./logger/logger.js";
 
 /**
 * This will initialize all the dependencies for NAT
@@ -18,10 +18,12 @@ export async function initCmd(args: CliOptions) {
 	await resetNatFolder();
 	await initDependencies(args);
 	await initCertificates(args);
+
 	if (!existsSync(getConnectionsDir())) {
-		logger.info("No connection folder found wile initializing, prompting");
-		await addConnection(args);
+		logger.warn("No connection folder found while initializing, prompting");
+		await addConnection();
 	}
+
 	logger.info("Successfully initialized");
 }
 
@@ -29,6 +31,7 @@ export async function initCmd(args: CliOptions) {
 * Packages the current working dir to a .package
 */
 export async function buildCmd(args: CliOptions) {
+	logger.info("Building");
 	const cwd = process.cwd();
 	const outFolder = join(cwd, args.outFolder);
 
@@ -41,5 +44,18 @@ export async function buildCmd(args: CliOptions) {
 	await vrotsc(args, artifactData);
 	// Runs vropkg to create the .package file
 	await vropkg(args, artifactData);
+	logger.info("Done building");
 	logger.info(`Elapsed time generating package: ${(Date.now() - start) / 1000}s`);
+}
+
+/**
+* Adds a new connection. Will prompt the user if needed
+*/
+export async function addConnectionCmd(args: CliOptions) {
+	logger.info("Adding a new connection");
+	await addConnection();
+	logger.info("Done adding a new connection");
+}
+
+export async function pushCmd(args: CliOptions) {
 }

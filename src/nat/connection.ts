@@ -1,5 +1,4 @@
 import inquirer, { InputQuestion } from "inquirer";
-import { CliOptions } from "../arguments.js";
 import { readFile, readdir, rm, writeFile } from "fs/promises";
 import { getConnectionsDir } from "../helpers/fs/locations.js";
 import { join } from "path";
@@ -101,11 +100,10 @@ export async function getConnection(connectionName: string): Promise<Connection>
 * This will prompt you for the connection details and save it given the name.
 * If you already have one called the same name, it will be overwritten
 */
-export async function addConnection(args: CliOptions): Promise<void> {
-	logger.info(`Adding a new connection`);
+export async function addConnection(): Promise<void> {
 	const answer = await inquirer.prompt(questions);
 	await ensureDirExists(getConnectionsDir());
 	await deleteConnection(answer.name);
 	await writeFile(getConnectionPath(answer.name), JSON.stringify(answer, null, 4));
-	logger.info(`Connection (${answer.name}) successfully added`);
+	logger.debug(`Connection (${answer.name}) successfully added`);
 }
