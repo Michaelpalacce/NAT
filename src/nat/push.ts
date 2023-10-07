@@ -7,33 +7,11 @@ import inquirer from "inquirer";
 import { getConnections, hasConnection } from "./connection.js";
 import logger from "../logger/logger.js";
 import { ArtifactData, fetchArtifactData } from "../helpers/maven/artifact.js";
+import { join } from "path";
 
 export default async function(args: CliOptions) {
 	//WIP
-	let connection = args.connection;
-	const connectionExists = hasConnection(connection);
-	if (!connection || !connectionExists) {
-		logger.info("No connection specified, prompting.");
-		const connections = await getConnections();
-
-		if (connections.length === 0) {
-			throw new Error("Trying to push to Aria Orhcestrator, but no connections have been added. Run `nat --addConnection` first");
-		}
-
-		const answers = await inquirer.prompt([
-			{
-				name: "connection",
-				type: "list",
-				message: "Connection To Use: ",
-				choices: connections,
-				default: connections[0]
-			}
-		]);
-
-		connection = answers.connection;
-	}
-
-	const loginClient = await LoginClient.fromConnection(connection);
+	const loginClient = await LoginClient.fromConnection(args.connection);
 	loginClient.setLoginInterceptorInInstance();
 
 	const artifactData: ArtifactData = await fetchArtifactData(process.cwd());

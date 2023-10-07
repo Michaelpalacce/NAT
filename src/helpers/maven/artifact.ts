@@ -1,12 +1,14 @@
 import { promisify } from "util";
 import pomParser from "pom-parser";
-import { join, parse } from "path";
+import { join } from "path";
 import { existsSync } from "fs";
 import { readFile, writeFile } from "fs/promises";
 import logger from "../../logger/logger.js";
 
 const parsePom = promisify(pomParser.parse);
-const artifactLockFileName = 'nat.lock';
+const ARTIFACT_LOCK_FILE_NAME = 'nat.lock';
+
+let artifact: ArtifactData;
 
 //@TODO FINISH ME WHEN WE GET THERE
 export interface Dependency {
@@ -35,24 +37,27 @@ export async function readLockFile(lockFileLocation: string): Promise<string | n
  * This is done to minimize the overhead of converting the code
  * @TODO Save this once fetched in memory?
  */
-export async function fetchArtifactData(containingDir: string): Promise<ArtifactData> {
+export async function fetchArtifactData(containingDir: string, force: boolean = false): Promise<ArtifactData> {
 	logger.info("Fetching artifact data");
-	const lockFileLocation = join(containingDir, artifactLockFileName);
-	const lockData = await readLockFile(lockFileLocation);
+	if (artifact && !force) {
+		return artifact;
+	}
 
-	let artifact: ArtifactData;
+	const lockFileLocation = join(containingDir, ARTIFACT_LOCK_FILE_NAME);
+	const lockData = await readLockFile(lockFileLocation);
 
 	if (lockData) {
 		try {
 			artifact = JSON.parse(lockData);
-			logger.debug(`Discovered existing artifact from ${artifactLockFileName}: ${JSON.stringify(artifact, null, 4)}`);
 		}
 		catch (e) {
 			throw new Error(`Error while trying to parse the data retrieved from ${lockFileLocation}, check that the format is correct. Error was: ${e}`);
 		}
+
+		logger.debug(`Discovered existing artifact from ${ARTIFACT_LOCK_FILE_NAME}: ${JSON.stringify(artifact, null, 4)}`);
 	}
 	else {
-		logger.debug(`No ${artifactLockFileName} found, trying to parse the pom.xml`);
+		logger.debug(`No ${ARTIFACT_LOCK_FILE_NAME} found, trying to parse the pom.xml`);
 		let pomResponse: any;
 
 		try {
@@ -61,7 +66,7 @@ export async function fetchArtifactData(containingDir: string): Promise<Artifact
 			});
 		}
 		catch (e) {
-			throw new Error(`No ${artifactLockFileName} found in ${containingDir} and pom.xml was not parsed successfully. Error was: ${e}`);
+			throw new Error(`No ${ARTIFACT_LOCK_FILE_NAME} found in ${containingDir} and pom.xml was not parsed successfully. Error was: ${e}`);
 		}
 
 		const project = pomResponse.pomObject.project;
@@ -73,9 +78,10 @@ export async function fetchArtifactData(containingDir: string): Promise<Artifact
 			dependencies: []
 		};
 
-		logger.debug(`Extracted ArtifactData: ${JSON.stringify(artifact, null, 4)}`);
+		const body = JSON.stringify(artifact, null, 4);
 
-		await writeFile(lockFileLocation, JSON.stringify(artifact, null, 4));
+		logger.debug(`Extracted ArtifactData: ${body}`);
+		await writeFile(lockFileLocation, body);
 	}
 
 	logger.info("Done fetching artifact data");
