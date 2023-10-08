@@ -1,5 +1,5 @@
 import { parseArguments } from "./arguments.js";
-import { initCmd, buildCmd, pushCmd, addConnectionCmd } from "./commands.js";
+import { initCmd, buildCmd, pushCmd, addConnectionCmd, testCmd } from "./commands.js";
 
 /**
 * This contains all the CLI handling of NAT
@@ -17,6 +17,10 @@ export default async function() {
 
 	if (args.build) {
 		await buildCmd(args);
+	}
+
+	if (args.test) {
+		await testCmd(args);
 	}
 
 	if (args.push) {

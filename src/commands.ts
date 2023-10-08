@@ -11,6 +11,7 @@ import { ArtifactData, fetchArtifactData } from "./helpers/maven/artifact.js";
 import logger from "./logger/logger.js";
 import push from "./nat/push.js";
 import inquirer from "inquirer";
+import vrotest from "./btva/vrotest.js";
 
 /**
 * This will initialize all the dependencies for NAT
@@ -47,6 +48,14 @@ export async function buildCmd(args: CliOptions) {
 	// Runs vropkg to create the .package file
 	await vropkg(args, artifactData);
 	logger.verbose(`Done Building: Took: ${(Date.now() - start) / 1000}s`);
+}
+
+export async function testCmd(args: CliOptions) {
+	const cwd = process.cwd();
+
+	const artifactData: ArtifactData = await fetchArtifactData(cwd);
+
+	await vrotest(args, artifactData);
 }
 
 /**

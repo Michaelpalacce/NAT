@@ -9,6 +9,7 @@ export interface CliOptions {
 
 	init: boolean,
 	build: boolean,
+	test: boolean,
 	push: boolean,
 	connection: string,
 	addConnection: boolean;
@@ -34,6 +35,7 @@ export function parseArguments() {
 
 			init: { type: Boolean, defaultValue: false, description: "Initialize NAT dependencies, downloads vrotsc and vropkg from maven central" },
 			build: { type: Boolean, defaultValue: false, alias: "b", description: "Prepares a package that can be pushed" },
+			test: { type: Boolean, defaultValue: false, alias: "t", description: "Runs tests" },
 			push: { type: Boolean, defaultValue: false, alias: "p", description: "WIP: Pushes the prepared package" },
 			connection: { type: String, defaultValue: '', alias: "c", description: "Connection to use when pushing the package" },
 			addConnection: { type: Boolean, defaultValue: false, description: "Adds a new Aria connection" },

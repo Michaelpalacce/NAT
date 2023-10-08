@@ -80,7 +80,7 @@ async function initNodeDependency(args: CliOptions, dependencyName: string) {
 	logger.debug(`Downloading ${dependencyName}`);
 	const artifactLocation = await download.default(
 		{
-			artifactId: "vropkg",
+			artifactId: dependencyName,
 			groupId: "com.vmware.pscoe.iac",
 			version: btvaVersion,
 			extension: "tgz"
@@ -96,7 +96,7 @@ async function initNodeDependency(args: CliOptions, dependencyName: string) {
 		dest: moduleLocation
 	});
 
-	logger.debug(`Running npm link for ${dependencyName}`);
+	logger.debug(`Running npm link for ${dependencyName} located at ${join(moduleLocation, 'package')}`);
 	await execa('npm', ['link'], { cwd: join(moduleLocation, 'package') });
 
 	logger.info(`Done setting up ${dependencyName}`);
