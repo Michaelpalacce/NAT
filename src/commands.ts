@@ -62,12 +62,12 @@ export async function pushCmd(args: CliOptions) {
 	logger.verbose("Pushing Code");
 
 	if (!args.connection || !hasConnection(args.connection)) {
-		logger.warn("No connection specified, or specified connection does not exists, prompting.");
 		const connections = await getConnections();
 
 		if (connections.length === 0)
 			throw new Error("Trying to push to Aria Orhcestrator, but no connections have been added. Run `nat --addConnection` first");
 
+		logger.warn("No connection specified, or specified connection does not exists, prompting.");
 		const answers = await inquirer.prompt([
 			{
 				name: "connection",
