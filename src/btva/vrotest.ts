@@ -40,8 +40,8 @@ export default async function(args: CliOptions, artifactData: ArtifactData) {
 		'build',
 		'--actions', `${outFolder}/vro-sources/js/src/main/resources`,
 		'--testHelpers', `${outFolder}/vro-sources/testHelpers/src/main/resources`,
-		'--tests', `${outFolder}/test`,
-		'--maps', `${outFolder}/map`,
+		'--tests', `${outFolder}/vro-sources/test`,
+		'--maps', `${outFolder}/vro-sources/map`,
 		'--resources', `${outFolder}/vro-sources/xml/src/main/resources/ResourceElement`,
 		'--configurations', `${outFolder}/vro-sources/xml/src/main/resources/ConfigurationElement`,
 		'--ts-src', `src`,
@@ -50,8 +50,6 @@ export default async function(args: CliOptions, artifactData: ArtifactData) {
 		'--helpers', `node_modules/@vmware-pscoe/vro-scripting-api/lib`,
 		'--output', `${outFolder}/vro-tests`,
 	]);
-
-	console.log(stdout);
 
 	//@ts-ignore
 	await execa('vrotest', ['run', `${outFolder}/vro-tests`]).pipeStdout(process.stdout).pipeStderr(process.stderr);
