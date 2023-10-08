@@ -63,19 +63,22 @@ export async function initCertificates(args: CliOptions) {
 }
 
 /**
-* Will download vrotsc and vropkg to your home directory and npm link them
+* Logic relevant to initializing node modules fetching them from a mvn repo
+* Logic is as follows:
+* - Fetches the artifact from mvn
+* - Untars the artifact
+* - Runs `npm link`
 */
-export async function initDependencies(args: CliOptions) {
+async function initNodeDependency(args: CliOptions, dependencyName: string) {
+	logger.info(`Setting up ${dependencyName}`);
+
 	const { btvaVersion } = args;
 
 	const natFolder = getNatConfigDir();
-	const vropkgModule = join(natFolder, 'vropkg');
-	const vrotscModule = join(natFolder, 'vrotsc');
+	const moduleLocation = join(natFolder, dependencyName);
 
-	logger.info(`Setting up vrotsc and vropkg in ${natFolder}`);
-
-	logger.debug("Downloading vrotsc and vropkg");
-	const vropkgLocation = await download.default(
+	logger.debug(`Downloading ${dependencyName}`);
+	const artifactLocation = await download.default(
 		{
 			artifactId: "vropkg",
 			groupId: "com.vmware.pscoe.iac",
@@ -85,36 +88,29 @@ export async function initDependencies(args: CliOptions) {
 		natFolder
 	);
 
-	logger.debug(`Downloaded vropkg to ${vropkgLocation}`);
-	const vrotscLocation = await download.default(
-		{
-			artifactId: 'vrotsc',
-			groupId: "com.vmware.pscoe.iac",
-			version: btvaVersion,
-			extension: 'tgz'
-		},
-		natFolder
-	);
+	logger.debug(`Downloaded ${dependencyName} to ${artifactLocation}`);
 
-	logger.debug(`Downloaded vrotsc to ${vrotscLocation}`);
-	logger.debug("Decompressing vropkg and vrotsc");
-	// decompress files from tar.gz archive
+	logger.debug(`Decompressing ${dependencyName} to ${moduleLocation}`);
 	await untar({
-		src: vrotscLocation,
-		dest: vrotscModule
+		src: artifactLocation,
+		dest: moduleLocation
 	});
 
-	await untar({
-		src: vropkgLocation,
-		dest: vropkgModule
-	});
+	logger.debug(`Running npm link for ${dependencyName}`);
+	await execa('npm', ['link'], { cwd: join(moduleLocation, 'package') });
 
-	logger.debug("Running npm link for vrotsc and vropkg");
+	logger.info(`Done setting up ${dependencyName}`);
+}
 
-	await execa('npm', ['link'], { cwd: join(vrotscModule, 'package') });
-	await execa('npm', ['link'], { cwd: join(vropkgModule, 'package') });
+/**
+* Will download vrotsc and vropkg to your home directory and npm link them
+*/
+export async function initDependencies(args: CliOptions) {
+	const dependencies = ['vropkg', 'vrotsc', 'vrotest'];
 
-	logger.info("Done setting up vrotsc and vropkg");
+	for (const dependencyName of dependencies) {
+		await initNodeDependency(args, dependencyName);
+	}
 }
 
 ////////////////////////////////// Archive, may be useful /////////////////////////////////////////////
