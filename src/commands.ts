@@ -30,23 +30,44 @@ export async function initCmd(args: CliOptions) {
 	logger.verbose("Successfully initialized");
 }
 
-/**
-* Packages the current working dir to a .package
-*/
-export async function buildCmd(args: CliOptions) {
-	logger.verbose("Building");
+export async function vrotscCmd(args: CliOptions) {
 	const cwd = process.cwd();
 	const outFolder = join(cwd, args.outFolder);
 
-	const start = Date.now();
 	// Fetches artifact data, stores it in a lock file and returns it. Alternatively if the lock file exists, fetches it from there
 	const artifactData: ArtifactData = await fetchArtifactData(cwd);
-	// Clears out the outDirectory
-	ensureDirClean(outFolder);
+
+	if (args.files) {
+		// Clears out the outDirectory
+		ensureDirClean(outFolder);
+	}
+
 	// Runs vrotsc to transpile TS code
 	await vrotsc(args, artifactData);
+}
+
+export async function vropkgCmd(args: CliOptions) {
+	const cwd = process.cwd();
+
+	// Fetches artifact data, stores it in a lock file and returns it. Alternatively if the lock file exists, fetches it from there
+	const artifactData: ArtifactData = await fetchArtifactData(cwd);
+
 	// Runs vropkg to create the .package file
 	await vropkg(args, artifactData);
+}
+
+/**
+* Packages the current working dir to a .package
+* Will skip cleaning up the dir if --files is passed to support incremental updates
+*/
+export async function buildCmd(args: CliOptions) {
+	logger.verbose("Building");
+
+	const start = Date.now();
+
+	await vrotscCmd(args);
+	await vropkgCmd(args);
+
 	logger.verbose(`Done Building: Took: ${(Date.now() - start) / 1000}s`);
 }
 
