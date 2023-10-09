@@ -26,6 +26,7 @@ export default async function() {
 		await addConnectionCmd(args);
 	}
 
+	// NO QUEUES FOR NOW, DON'T USE
 	if (args.watch) {
 		const watcher = watch(join(process.cwd(), "src"), { ignored: /^\./, persistent: true });
 		let filesBuffer: string[] = [];
@@ -37,8 +38,11 @@ export default async function() {
 			filesBuffer = [];
 			try {
 				await vrotscCmd(args);
+				args.files = "";
+				await vropkgCmd(args);
+				await pushCmd(args);
 			} catch (e) {
-				console.log(e);
+				console.log((e as any).message);
 			}
 		});
 
