@@ -1,5 +1,5 @@
 {
-	"name": "nat",
+	"name": "node-aria-tools",
 	"version": "1.2.2",
 	"description": "NAT stands for  - NodeJS - Aria - Tools",
 	"main": "src/index.ts",
