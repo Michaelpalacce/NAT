@@ -1,6 +1,6 @@
 import { watch } from "chokidar";
 import { parseArguments } from "./arguments.js";
-import { initCmd, buildCmd, pushCmd, addConnectionCmd, testCmd, cleanCmd, vropkgCmd } from "./commands.js";
+import { initCmd, buildCmd, pushCmd, addConnectionCmd, testCmd, cleanCmd } from "./commands.js";
 import { basename, join } from "path";
 import logger from "./logger/logger.js";
 import debounce from "./helpers/debounce.js";
@@ -24,6 +24,10 @@ export default async function() {
 
 	if (args.clean) {
 		await cleanCmd(args);
+	}
+
+	if (args.build || args.watch) {
+		await buildCmd(args);
 	}
 
 	if (args.watch) {
@@ -56,14 +60,6 @@ export default async function() {
 			.on('error', function(error) {
 				logger.error(`Error: ${error}`);
 			});
-	}
-
-	if (args.build) {
-		await buildCmd(args);
-	}
-
-	if (args.package) {
-		await vropkgCmd(args);
 	}
 
 	if (args.test) {

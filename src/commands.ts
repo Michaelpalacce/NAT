@@ -1,4 +1,3 @@
-import { join } from "path";
 import { CliOptions } from "./arguments.js";
 import { initCertificates, initDependencies, resetNatFolder } from "./nat/init.js";
 import ensureDirClean from "./helpers/fs/ensureDirClean.js";
@@ -12,6 +11,32 @@ import logger from "./logger/logger.js";
 import push from "./nat/push.js";
 import inquirer from "inquirer";
 import vrotest from "./btva/vrotest.js";
+
+/**
+* Runs vrotsc that compiles the TS code to JS, will clean up the outFolder if files are not given
+* Fetches artifact data, stores it in a lock file and returns it. Alternatively if the lock file exists, fetches it from there
+*/
+async function vrotscCmd(args: CliOptions) {
+	const artifactData: ArtifactData = await fetchArtifactData(process.cwd());
+
+	if (!args.files) {
+		await cleanCmd(args);
+	}
+
+	// Runs vrotsc to transpile TS code
+	await vrotsc(args, artifactData);
+}
+
+/**
+* Runs vropkg to create the .package file
+*/
+async function vropkgCmd(args: CliOptions) {
+	const cwd = process.cwd();
+
+	const artifactData: ArtifactData = await fetchArtifactData(cwd);
+
+	await vropkg(args, artifactData);
+}
 
 /**
 * This will initialize all the dependencies for NAT
@@ -41,31 +66,6 @@ export async function cleanCmd(args: CliOptions) {
 	logger.verbose(`Done cleaning: ${outFolder}`);
 }
 
-/**
-* Runs vrotsc that compiles the TS code to JS, will clean up the outFolder if files are not given
-* Fetches artifact data, stores it in a lock file and returns it. Alternatively if the lock file exists, fetches it from there
-*/
-export async function vrotscCmd(args: CliOptions) {
-	const artifactData: ArtifactData = await fetchArtifactData(process.cwd());
-
-	if (!args.files) {
-		await cleanCmd(args);
-	}
-
-	// Runs vrotsc to transpile TS code
-	await vrotsc(args, artifactData);
-}
-
-/**
-* Runs vropkg to create the .package file
-*/
-export async function vropkgCmd(args: CliOptions) {
-	const cwd = process.cwd();
-
-	const artifactData: ArtifactData = await fetchArtifactData(cwd);
-
-	await vropkg(args, artifactData);
-}
 
 /**
 * Packages the current working dir to a .package
@@ -77,7 +77,6 @@ export async function buildCmd(args: CliOptions) {
 	const start = Date.now();
 
 	await vrotscCmd(args);
-	await vropkgCmd(args);
 
 	logger.verbose(`Done Building: Took: ${(Date.now() - start) / 1000}s`);
 }
@@ -104,6 +103,8 @@ export async function addConnectionCmd(args: CliOptions) {
 
 export async function pushCmd(args: CliOptions) {
 	logger.verbose("Pushing Code");
+
+	await vropkgCmd(args);
 
 	if (!args.connection || !hasConnection(args.connection)) {
 		const connections = await getConnections();

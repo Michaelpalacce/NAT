@@ -15,7 +15,6 @@ export interface CliOptions {
 	build: boolean,
 	files: string,
 	test: boolean,
-	package: boolean,
 	push: boolean,
 	connection: string,
 	addConnection: boolean;
@@ -45,10 +44,9 @@ export function parseArguments() {
 			clean: { type: Boolean, defaultValue: false, description: "Cleans up the NAT folder" },
 			watch: { type: Boolean, defaultValue: false, alias: "w", description: "Watches for changes after initial build" },
 			watchMs: { type: Number, defaultValue: 5000, description: "How long should we try to compile" },
-			build: { type: Boolean, defaultValue: false, alias: "b", description: "Prepares a package that can be pushed" },
+			build: { type: Boolean, defaultValue: false, alias: "b", description: "Builds the code TS -> JS" },
 			test: { type: Boolean, defaultValue: false, alias: "t", description: "Runs tests" },
-			package: { type: Boolean, defaultValue: false, alias: "P", description: "Runs vropkg on the generated code" },
-			push: { type: Boolean, defaultValue: false, alias: "p", description: "WIP: Pushes the prepared package" },
+			push: { type: Boolean, defaultValue: false, alias: "p", description: "WIP: Prepares and pushes the package" },
 
 			// Build Lifecycle Options
 			outFolder: { type: String, defaultValue: DEFAULT_OUT_FOLDER, description: "Where to output the generated `.package` file as well as other build artifacts. Default: NAT" },
