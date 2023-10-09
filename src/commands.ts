@@ -30,29 +30,40 @@ export async function initCmd(args: CliOptions) {
 	logger.verbose("Successfully initialized");
 }
 
+/**
+* Cleans the outFolder
+*/
+export async function cleanCmd(args: CliOptions) {
+	const { outFolder } = args;
+
+	logger.verbose(`Cleaning: ${outFolder}`);
+	ensureDirClean(outFolder);
+	logger.verbose(`Done cleaning: ${outFolder}`);
+}
+
+/**
+* Runs vrotsc that compiles the TS code to JS, will clean up the outFolder if files are not given
+* Fetches artifact data, stores it in a lock file and returns it. Alternatively if the lock file exists, fetches it from there
+*/
 export async function vrotscCmd(args: CliOptions) {
-	const cwd = process.cwd();
-	const outFolder = join(cwd, args.outFolder);
+	const artifactData: ArtifactData = await fetchArtifactData(process.cwd());
 
-	// Fetches artifact data, stores it in a lock file and returns it. Alternatively if the lock file exists, fetches it from there
-	const artifactData: ArtifactData = await fetchArtifactData(cwd);
-
-	if (args.files) {
-		// Clears out the outDirectory
-		ensureDirClean(outFolder);
+	if (!args.files) {
+		await cleanCmd(args);
 	}
 
 	// Runs vrotsc to transpile TS code
 	await vrotsc(args, artifactData);
 }
 
+/**
+* Runs vropkg to create the .package file
+*/
 export async function vropkgCmd(args: CliOptions) {
 	const cwd = process.cwd();
 
-	// Fetches artifact data, stores it in a lock file and returns it. Alternatively if the lock file exists, fetches it from there
 	const artifactData: ArtifactData = await fetchArtifactData(cwd);
 
-	// Runs vropkg to create the .package file
 	await vropkg(args, artifactData);
 }
 
@@ -71,6 +82,9 @@ export async function buildCmd(args: CliOptions) {
 	logger.verbose(`Done Building: Took: ${(Date.now() - start) / 1000}s`);
 }
 
+/**
+* Runs vrotest. This will prepare a testbed and run the tests there
+*/
 export async function testCmd(args: CliOptions) {
 	const cwd = process.cwd();
 

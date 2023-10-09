@@ -10,6 +10,7 @@ export interface CliOptions {
 
 	watch: boolean,
 
+	clean: boolean,
 	init: boolean,
 	build: boolean,
 	files: string,
