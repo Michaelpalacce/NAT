@@ -6,7 +6,7 @@ import logger from "../logger/logger.js";
 /**
 * This will run vrotsc, it will transpile the code to js
 */
-export default async function(args: CliOptions, artifactData: ArtifactData) {
+export default async function(args: CliOptions, artifactData: ArtifactData, watchFiles?: string) {
 	const { outFolder, files } = args;
 	const { artifactId, groupId } = artifactData;
 	const namespace = `${groupId}.${artifactId}`;
@@ -18,7 +18,7 @@ export default async function(args: CliOptions, artifactData: ArtifactData) {
 		'src',
 		'--actionsNamespace', `${groupId}.${artifactId}`,
 		'--workflowsNamespace', artifactId,
-		'--files', files,
+		'--files', watchFiles || files,
 		'--typesOut', `${outFolder}/vro-types`,
 		'--testsOut', `${outFolder}/vro-sources/test/${namespacePath}`,
 		'--mapsOut', `${outFolder}/vro-sources/map/${namespacePath}`,
