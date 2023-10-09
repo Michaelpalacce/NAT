@@ -9,6 +9,6 @@ logger.info(`Node Aria Tools`);
 
 const start = Date.now();
 
-cli();
+await cli();
 
 logger.info(`Total time: ${(Date.now() - start) / 1000}s`);
