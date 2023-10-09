@@ -13,7 +13,7 @@ export default async function(args: CliOptions, artifactData: ArtifactData, watc
 	const namespacePath = namespace.replaceAll('.', '/');
 
 	const start = Date.now();
-	logger.info(`Running vrotsc.`);
+	logger.debug(`Running vrotsc.`);
 	await execa('vrotsc', [
 		'src',
 		'--actionsNamespace', `${groupId}.${artifactId}`,
@@ -29,5 +29,5 @@ export default async function(args: CliOptions, artifactData: ArtifactData, watc
 		'--resourcesOut', `${outFolder}/vro-sources/xml/src/main/resources/ResourceElement`,
 		'--configsOut', `${outFolder}/vro-sources/xml/src/main/resources/ConfigurationElement`
 	]);
-	logger.info(`Finished running vrotsc. Took: ${(Date.now() - start) / 1000}s`);
+	logger.debug(`Finished running vrotsc. Took: ${(Date.now() - start) / 1000}s`);
 }

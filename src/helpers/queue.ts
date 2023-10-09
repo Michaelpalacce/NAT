@@ -1,25 +1,28 @@
 import logger from "../logger/logger.js";
 
-export class PromiseQueue {
-	private queue: Promise<any>[] = [];
+export class Queue {
+	private queue: Function[] = [];
 	private running: boolean = false;
 
-	add(promise: Promise<any>) {
-		this.queue.push(promise);
+	add(callback: Function) {
+		this.queue.push(callback);
 		this.resolve();
 	}
 
 	/**
 	* Gets the first element from the queue and waits for it to finish. Then runs the next until no more.
 	*/
-	resolve() {
+	async resolve() {
 		if (this.queue.length && !this.running) {
 			this.running = true;
-			const promise = this.queue.shift();
-			if (promise)
-				promise.then(() => this.resolve()).catch((e) => {
-					logger.warn(`Error while queueing vrotsc: ${e}`);
-				}).finally(() => this.running = false);
+			const cbToCall = this.queue.shift();
+			if (cbToCall) {
+				await cbToCall().catch((e) => {
+					logger.warn(`Error: ${e}`);
+				});
+				this.running = false;
+				this.resolve();
+			}
 		}
 	}
 }

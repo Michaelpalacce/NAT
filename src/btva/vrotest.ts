@@ -13,7 +13,7 @@ export default async function(args: CliOptions, artifactData: ArtifactData) {
 	const namespace = `${groupId}.${artifactId}`;
 
 	const start = Date.now();
-	logger.info(`Running vrotest.`);
+	logger.debug(`Running vrotest.`);
 	//@ts-ignore
 	const { stdout } = await execa('vrotest', [
 		'build',
@@ -32,5 +32,5 @@ export default async function(args: CliOptions, artifactData: ArtifactData) {
 
 	//@ts-ignore
 	await execa('vrotest', ['run', `${outFolder}/vro-tests`]).pipeStdout(process.stdout).pipeStderr(process.stderr);
-	logger.info(`Finished running vrotest. Took: ${(Date.now() - start) / 1000}s`);
+	logger.debug(`Finished running vrotest. Took: ${(Date.now() - start) / 1000}s`);
 }

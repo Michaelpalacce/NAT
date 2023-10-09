@@ -15,6 +15,7 @@ export interface CliOptions {
 	build: boolean,
 	files: string,
 	test: boolean,
+	package: boolean,
 	push: boolean,
 	connection: string,
 	addConnection: boolean;
@@ -41,11 +42,12 @@ export function parseArguments() {
 			keystoreLocation: { type: String, defaultValue: join(getHomedir(), ".m2", "keystore"), description: "Init: Holds the location to the keystore folder. Must contain a cert.pem and a private_key.pem. Default: ~/.m2/keystore" },
 
 			// Build + Push
+			clean: { type: Boolean, defaultValue: false, description: "Cleans up the NAT folder" },
 			watch: { type: Boolean, defaultValue: false, alias: "w", description: "Watches for changes after initial build" },
 			watchMs: { type: Number, defaultValue: 5000, description: "How long should we try to compile" },
-			clean: { type: Boolean, defaultValue: false, description: "Cleans up the NAT folder" },
 			build: { type: Boolean, defaultValue: false, alias: "b", description: "Prepares a package that can be pushed" },
 			test: { type: Boolean, defaultValue: false, alias: "t", description: "Runs tests" },
+			package: { type: Boolean, defaultValue: false, alias: "P", description: "Runs vropkg on the generated code" },
 			push: { type: Boolean, defaultValue: false, alias: "p", description: "WIP: Pushes the prepared package" },
 
 			// Build Lifecycle Options
