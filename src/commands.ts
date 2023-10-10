@@ -12,37 +12,13 @@ import push from "./nat/push.js";
 import inquirer from "inquirer";
 import vrotest from "./btva/vrotest.js";
 
-/**
-* Runs vrotsc that compiles the TS code to JS, will clean up the outFolder if files are not given
-* Fetches artifact data, stores it in a lock file and returns it. Alternatively if the lock file exists, fetches it from there
-*/
-async function vrotscCmd(args: CliOptions) {
-	const artifactData: ArtifactData = await fetchArtifactData(process.cwd());
-
-	if (!args.files) {
-		await cleanCmd(args);
-	}
-
-	// Runs vrotsc to transpile TS code
-	await vrotsc(args, artifactData);
-}
-
-/**
-* Runs vropkg to create the .package file
-*/
-async function vropkgCmd(args: CliOptions) {
-	const cwd = process.cwd();
-
-	const artifactData: ArtifactData = await fetchArtifactData(cwd);
-
-	await vropkg(args, artifactData);
-}
 
 /**
 * This will initialize all the dependencies for NAT
 */
 export async function initCmd(args: CliOptions) {
 	logger.verbose("Initializing NAT");
+
 	await resetNatFolder();
 	await initDependencies(args);
 	await initCertificates(args);
@@ -68,12 +44,11 @@ export async function cleanCmd(args: CliOptions) {
 
 
 /**
-* Packages the current working dir to a .package
+* Compiles the project with vrotsc. TS -> JS
 * Will skip cleaning up the dir if --files is passed to support incremental updates
 */
 export async function buildCmd(args: CliOptions) {
 	logger.verbose("Building");
-
 	const start = Date.now();
 
 	await vrotscCmd(args);
@@ -85,11 +60,12 @@ export async function buildCmd(args: CliOptions) {
 * Runs vrotest. This will prepare a testbed and run the tests there
 */
 export async function testCmd(args: CliOptions) {
-	const cwd = process.cwd();
+	logger.verbose("Running tests");
+	const start = Date.now();
 
-	const artifactData: ArtifactData = await fetchArtifactData(cwd);
+	await vrotest(args, await fetchArtifactData(process.cwd()));
 
-	await vrotest(args, artifactData);
+	logger.verbose(`Finished with tests: Took: ${(Date.now() - start) / 1000}s`);
 }
 
 /**
@@ -97,12 +73,18 @@ export async function testCmd(args: CliOptions) {
 */
 export async function addConnectionCmd(args: CliOptions) {
 	logger.verbose("Adding a new connection");
+
 	await addConnection();
+
 	logger.verbose("Done adding a new connection");
 }
 
+/**
+* Packages the code and pushes it
+*/
 export async function pushCmd(args: CliOptions) {
 	logger.verbose("Pushing Code");
+	const start = Date.now();
 
 	await vropkgCmd(args);
 
@@ -127,5 +109,33 @@ export async function pushCmd(args: CliOptions) {
 	}
 
 	push(args);
-	logger.verbose("Done pushing Code");
+	logger.verbose(`Done pushing Code: Took: ${(Date.now() - start) / 1000}s`);
+}
+
+//////////////////////////////// PRIVATE ///////////////////////////////////////
+
+/**
+* Runs vrotsc that compiles the TS code to JS, will clean up the outFolder if files are not given
+* Fetches artifact data, stores it in a lock file and returns it. Alternatively if the lock file exists, fetches it from there
+*/
+async function vrotscCmd(args: CliOptions) {
+	const artifactData: ArtifactData = await fetchArtifactData(process.cwd());
+
+	if (!args.files) {
+		await cleanCmd(args);
+	}
+
+	// Runs vrotsc to transpile TS code
+	await vrotsc(args, artifactData);
+}
+
+/**
+* Runs vropkg to create the .package file
+*/
+async function vropkgCmd(args: CliOptions) {
+	const cwd = process.cwd();
+
+	const artifactData: ArtifactData = await fetchArtifactData(cwd);
+
+	await vropkg(args, artifactData);
 }

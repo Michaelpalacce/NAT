@@ -31,6 +31,7 @@ export default async function() {
 	}
 
 	if (args.watch) {
+		// Init
 		const queue = new Queue();
 		const watcher = watch(join(process.cwd(), "src"), { ignored: /^\./, persistent: true });
 		let filesBuffer: string[] = [];
@@ -40,7 +41,7 @@ export default async function() {
 			filesBuffer = [];
 
 			queue.add(async () => {
-				logger.info(`Compiling with filter: ${files}`);
+				logger.verbose(`Compiling with filter: ${files}`);
 				await vrotsc(args, await fetchArtifactData(process.cwd()), files);
 			});
 		}, args.watchMs);
@@ -50,16 +51,13 @@ export default async function() {
 				// We don't do anything
 			})
 			.on('change', async function(path) {
-				logger.debug(`CHANGE: ${path}`);
-				filesBuffer.push(path);
-				onChangeCallback(path);
+				const fileName = basename(path);
+				logger.debug(`CHANGE: ${fileName}`);
+				filesBuffer.push(fileName);
+				onChangeCallback(fileName);
 			})
-			.on('unlink', function(path) {
-				logger.warn(`File: ${path} has been deleted, currently this is not handled`);
-			})
-			.on('error', function(error) {
-				logger.error(`Error: ${error}`);
-			});
+			.on('unlink', function(path) { logger.warn(`File: ${path} has been deleted, currently this is not handled`); })
+			.on('error', function(error) { logger.error(`Error: ${error}`); });
 	}
 
 	if (args.test) {
