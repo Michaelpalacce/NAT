@@ -20,10 +20,15 @@ export default async function(args: CliOptions) {
 	const packageName = getPackageNameFromArtifactData(artifactData);
 	const location = join(process.cwd(), args.outFolder, 'vropkg', packageName);
 	form.append('file', createReadStream(location), packageName);
+	form.append('overwrite', 'true');
+	form.append('tagImportMode', 'ImportAndOverwriteExistingValue');
+	form.append('importConfigurationAttributeValues', 'false');
+	form.append('importConfigSecureStringAttributeValues', 'false');
 
 	logger.debug(`Going to upload: ${location}`);
 
-	const response = await axios.post(`https://${loginClient.getConfig().getUrl()}/vco/api/packages?overwrite=true&tagImportMode=ImportAndOverwriteExistingValue&importConfigurationAttributeValues=false&importConfigSecureStringAttributeValues=false`, form, { headers: form.getHeaders() }).catch(e => e);
+	const url = `https://${loginClient.getConfig().getUrl()}/vco/api/packages`;
+	const response = await axios.post(url, form, { headers: form.getHeaders() }).catch(e => e);
 	console.log(response.data);
 	logger.info(`${packageName} uploaded`);
 }
