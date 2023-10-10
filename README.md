@@ -9,6 +9,10 @@ NAT stands for
 
 - NodeJS 16
 
+## Philosophy
+
+Actions are segmented and are not run unless needed. This allows for faster compilation when needed.
+
 ## Usage
 
 ### First Run
@@ -30,6 +34,25 @@ nat -b -p
 This will be all you need... it will do mvn clean package if the target folder does not exists, since for now it still depends on it for certificates and
 dependencies
 
+### Tests
+
+```
+nat -b -t
+```
+This will build and test the code
+
+### Performance
+
+#### Watch Mode
+
+In one terminal:
+```
+nat --watch
+```
+Will build the code and start recompiling only the changed file.
+
+in a separate terminal you can run `nat -p` to push the code when it completes or even `nat -t` for tests
+
 ## Improvements
 
 - [x] Better Certificate Handling. Certificates should only work with local paths.
@@ -39,14 +62,13 @@ dependencies
 - [x] Building Code
 - [x] Compiling Code
 - [x] Convert information about the artifact to a special lock file.
-- [ ] Pushing code - Alpha
+- [x] Pushing code
+- [x] Running Tests
 - [ ] Improve Push Code Logic
 - [ ] Download dependencies and push them
 - [ ] Definitions? 
 - [ ] Save Artifact in memory so we don't read it twice
 - [ ] Don't rely on vrotsc and vropkg from maven central
-- [ ] Improve vrotsc and vropkg. Realistically I can rewrite them to depreciate support for vro 7 which will improve them significantly. Improve I/O may lead to significant improvements.
-- [ ] Running Tests
 
 ## Development
 
