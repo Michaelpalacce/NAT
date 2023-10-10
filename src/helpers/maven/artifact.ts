@@ -45,7 +45,7 @@ export async function readLockFile(lockFileLocation: string): Promise<string | n
  * After fetching the artifact once, we'll save the data in memory and use that instead to speed up the process. You can disable this by passing force = true
  */
 export async function fetchArtifactData(containingDir: string, force: boolean = false): Promise<ArtifactData> {
-	logger.info("Fetching artifact data");
+	logger.debug("Fetching artifact data");
 	if (artifact && !force) {
 		return artifact;
 	}
@@ -91,6 +91,6 @@ export async function fetchArtifactData(containingDir: string, force: boolean = 
 		await writeFile(lockFileLocation, body);
 	}
 
-	logger.info("Done fetching artifact data");
+	logger.debug("Done fetching artifact data");
 	return artifact;
 }

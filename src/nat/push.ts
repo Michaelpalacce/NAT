@@ -23,7 +23,7 @@ export default async function(args: CliOptions) {
 
 	logger.debug(`Going to upload: ${location}`);
 
-	const response = await axios.post(`https://${loginClient.getConfig().getUrl()}/vco/api/packages?overwrite=true&importConfigurationAttributeValues=false&importConfigSecureStringAttributeValues=false`, form, { headers: form.getHeaders() }).catch(e => e);
+	const response = await axios.post(`https://${loginClient.getConfig().getUrl()}/vco/api/packages?overwrite=true&tagImportMode=ImportAndOverwriteExistingValue&importConfigurationAttributeValues=false&importConfigSecureStringAttributeValues=false`, form, { headers: form.getHeaders() }).catch(e => e);
 	console.log(response.data);
 	logger.info(`${packageName} uploaded`);
 }
