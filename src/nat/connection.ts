@@ -5,6 +5,7 @@ import { join } from "path";
 import { existsSync } from "fs";
 import logger from "../logger/logger.js";
 import ensureDirExists from "../helpers/fs/ensureDirExists.js";
+import { DEFAULT_CONNECTION_NAME } from "../arguments.js";
 
 export interface Connection {
 	name: string,
@@ -21,7 +22,7 @@ const questions: InputQuestion[] = [
 		name: "name",
 		type: "input",
 		message: "Name connection: ",
-		default: "Aria"
+		default: DEFAULT_CONNECTION_NAME
 	},
 	{
 		name: "url",

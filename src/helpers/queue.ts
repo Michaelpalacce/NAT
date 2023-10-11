@@ -1,6 +1,6 @@
 import logger from "../logger/logger.js";
 
-export class Queue {
+export class AsyncQueue {
 	private queue: Function[] = [];
 	private running: boolean = false;
 

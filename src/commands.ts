@@ -11,13 +11,13 @@ import logger from "./logger/logger.js";
 import push from "./nat/push.js";
 import inquirer from "inquirer";
 import vrotest from "./btva/vrotest.js";
-
+import watch from "./nat/watch.js";
 
 /**
 * This will initialize all the dependencies for NAT
 */
 export async function initCmd(args: CliOptions) {
-	logger.verbose("Initializing NAT");
+	logger.info("Initializing NAT");
 
 	await resetNatFolder();
 	await initDependencies(args);
@@ -28,7 +28,7 @@ export async function initCmd(args: CliOptions) {
 		await addConnection();
 	}
 
-	logger.verbose("Successfully initialized");
+	logger.info("Successfully initialized");
 }
 
 /**
@@ -36,10 +36,11 @@ export async function initCmd(args: CliOptions) {
 */
 export async function cleanCmd(args: CliOptions) {
 	const { outFolder } = args;
+	logger.info(`Cleaning: ${outFolder}`);
 
-	logger.verbose(`Cleaning: ${outFolder}`);
 	ensureDirClean(outFolder);
-	logger.verbose(`Done cleaning: ${outFolder}`);
+
+	logger.info(`Done cleaning: ${outFolder}`);
 }
 
 
@@ -48,42 +49,42 @@ export async function cleanCmd(args: CliOptions) {
 * Will skip cleaning up the dir if --files is passed to support incremental updates
 */
 export async function buildCmd(args: CliOptions) {
-	logger.verbose("Building");
+	logger.info("Building");
 	const start = Date.now();
 
 	await vrotscCmd(args);
 
-	logger.verbose(`Done Building: Took: ${(Date.now() - start) / 1000}s`);
+	logger.info(`Done Building: Took: ${(Date.now() - start) / 1000}s`);
 }
 
 /**
 * Runs vrotest. This will prepare a testbed and run the tests there
 */
 export async function testCmd(args: CliOptions) {
-	logger.verbose("Running tests");
+	logger.info("Running tests");
 	const start = Date.now();
 
 	await vrotest(args, await fetchArtifactData(process.cwd()));
 
-	logger.verbose(`Finished with tests: Took: ${(Date.now() - start) / 1000}s`);
+	logger.info(`Finished with tests: Took: ${(Date.now() - start) / 1000}s`);
 }
 
 /**
 * Adds a new connection. Will prompt the user if needed
 */
 export async function addConnectionCmd(args: CliOptions) {
-	logger.verbose("Adding a new connection");
+	logger.info("Adding a new connection");
 
 	await addConnection();
 
-	logger.verbose("Done adding a new connection");
+	logger.info("Done adding a new connection");
 }
 
 /**
 * Packages the code and pushes it
 */
 export async function pushCmd(args: CliOptions) {
-	logger.verbose("Pushing Code");
+	logger.info("Pushing Code");
 	const start = Date.now();
 
 	await vropkgCmd(args);
@@ -109,7 +110,16 @@ export async function pushCmd(args: CliOptions) {
 	}
 
 	push(args);
-	logger.verbose(`Done pushing Code: Took: ${(Date.now() - start) / 1000}s`);
+	logger.info(`Done pushing Code: Took: ${(Date.now() - start) / 1000}s`);
+}
+
+/**
+* Starts a new watch on the `src` folder. In case of a change it will run vrotsc with a filter.
+*/
+export async function watchCmd(args: CliOptions) {
+	logger.info(`Starting a watch on 'src' folder. Waiting for changes`);
+
+	watch(args);
 }
 
 //////////////////////////////// PRIVATE ///////////////////////////////////////
