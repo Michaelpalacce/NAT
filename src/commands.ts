@@ -15,8 +15,10 @@ import watch from "./commands/watch/index.js";
 import { readFile } from "fs/promises";
 import { join } from "path";
 
+import version from "../package.json";
+
 export async function versionCmd(args: CliOptions) {
-	readFile(join(__dirname, "package.json"));
+	console.log(version);
 }
 
 /**
