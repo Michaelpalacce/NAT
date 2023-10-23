@@ -1,17 +1,23 @@
 import { CliOptions } from "./arguments.js";
-import { initCertificates, initDependencies, resetNatFolder } from "./nat/init.js";
+import { initCertificates, initDependencies, resetNatFolder } from "./commands/init/index.js";
 import ensureDirClean from "./helpers/fs/ensureDirClean.js";
 import vrotsc from "./btva/vrotsc.js";
 import vropkg from "./btva/vropkg.js";
 import { existsSync } from "fs";
 import { getConnectionsDir } from "./helpers/fs/locations.js";
-import { addConnection, getConnections, hasConnection } from "./nat/connection.js";
+import { addConnection, getConnections, hasConnection } from "./commands/connection/index.js";
 import { ArtifactData, fetchArtifactData } from "./helpers/maven/artifact.js";
 import logger from "./logger/logger.js";
-import push from "./nat/push.js";
+import push from "./commands/push/index.js";
 import inquirer from "inquirer";
 import vrotest from "./btva/vrotest.js";
-import watch from "./nat/watch.js";
+import watch from "./commands/watch/index.js";
+import { readFile } from "fs/promises";
+import { join } from "path";
+
+export async function versionCmd(args: CliOptions) {
+	readFile(join(__dirname, "package.json"));
+}
 
 /**
 * This will initialize all the dependencies for NAT

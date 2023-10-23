@@ -1,11 +1,14 @@
 import { parseArguments } from "./arguments.js";
-import { initCmd, buildCmd, pushCmd, addConnectionCmd, testCmd, cleanCmd, watchCmd } from "./commands.js";
+import { initCmd, buildCmd, pushCmd, addConnectionCmd, testCmd, cleanCmd, watchCmd, versionCmd } from "./commands.js";
 
 /**
 * This contains all the CLI handling of NAT
 */
 export default async function() {
 	const args = parseArguments();
+
+	if (args.version)
+		await versionCmd(args);
 
 	if (args.init)
 		await initCmd(args);

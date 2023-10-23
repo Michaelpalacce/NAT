@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import logger from "../../logger/logger.js";
 import Configuration from "../configuration.js";
-import { getConnection } from "../../nat/connection.js";
+import { getConnection } from "../../commands/connection/index.js";
 
 export default class LoginClient {
 	private token: string | null;

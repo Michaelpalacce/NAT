@@ -1,4 +1,4 @@
-import { Connection } from "../nat/connection.js";
+import { Connection } from "../commands/connection/connection.js";
 
 export default class Configuration {
 	constructor(private connection: Connection) {

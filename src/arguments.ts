@@ -7,6 +7,7 @@ export interface CliOptions {
 	keystoreLocation: string,
 
 	help: boolean,
+	version: boolean,
 
 	watch: boolean,
 	watchMs: number,
@@ -37,6 +38,7 @@ export function parseArguments(): CliOptions {
 		{
 			// META
 			help: { type: Boolean, defaultValue: false, alias: "h", description: "Displays Help" },
+			version: { type: Boolean, defaultValue: false, alias: "v", description: "Current version of the tool" },
 
 			// INIT
 			init: { type: Boolean, defaultValue: false, description: "Initialize NAT dependencies, downloads vrotsc and vropkg from maven central" },
@@ -54,7 +56,7 @@ export function parseArguments(): CliOptions {
 			// Build Lifecycle Options
 			outFolder: { type: String, defaultValue: DEFAULT_OUT_FOLDER, description: "Where to output the generated `.package` file as well as other build artifacts. Default: NAT" },
 			connection: { type: String, defaultValue: '', alias: "c", description: "Connection to use when pushing the package" },
-			files: { type: String, defaultValue: '', alias: "f", description: "Which files to only build" },
+			files: { type: String, defaultValue: '', description: "Which files to only build" },
 
 			// Connection specific
 			addConnection: { type: Boolean, defaultValue: false, description: "Adds a new Aria connection" },
