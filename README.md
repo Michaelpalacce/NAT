@@ -18,28 +18,26 @@ Actions are segmented and are not run unless needed. This allows for faster comp
 ### First Run
 
 Make sure to download the certificates locally. Paste them in ~/.m2/keystore. You must have a `cert.pem` and a `private_key.pem`.
-After that, create 
 
-Running
 ```bash
 nat --init
 ```
-Will install vrotsc and vropkg globally for you... you can specify different version of btva by passing --btvaVersion=2.35.0
+Will install vrotsc, vropkg and vrotest globally for you... you can specify different version of btva by passing --btvaVersion=2.35.0
 
 ### General
 
 ```
 nat -b -p
 ```
-This will be all you need... it will do mvn clean package if the target folder does not exists, since for now it still depends on it for certificates and
-dependencies
+This will be all you need...
+(TEMP)it will do `mvn clean package` if the `target` folder does not exists, since for now it still depends on it for dependencies (TEMP)
 
 ### Tests
 
 ```
-nat -b -t
+nat -t
 ```
-This will build and test the code
+This will test the code. You must have built it beforehand (or you can add `-b` to the command).
 
 ### Performance
 
@@ -51,7 +49,7 @@ nat --watch
 ```
 Will build the code and start recompiling only the changed file.
 
-in a separate terminal you can run `nat -p` to push the code when it completes or even `nat -t` for tests
+in a separate terminal you can run `nat -p` to push the code when it completes or even `nat -t` to run unit tests
 
 ## Improvements
 
@@ -66,9 +64,11 @@ in a separate terminal you can run `nat -p` to push the code when it completes o
 - [x] Running Tests
 - [x] Save Artifact in memory so we don't read it twice
 - [ ] Improve Push Code Logic
-- [ ] Download dependencies and push them
+- [ ] Only push changed files for watch mode?
+- [ ] Code Coverage
+- [ ] Download dependencies and push them too
 - [ ] Definitions? 
-- [ ] Don't rely on vrotsc and vropkg from maven central
+- [ ] Don't rely on vrotsc, vropkg and vrotest from maven central
 
 ## Development
 
