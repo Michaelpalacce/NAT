@@ -13,7 +13,8 @@ export default async function(args: CliOptions, artifactData: ArtifactData, watc
 	const namespacePath = namespace.replaceAll('.', '/');
 
 	const start = Date.now();
-	logger.debug(`Running vrotsc.`);
+	logger.info(`Running vrotsc.`);
+	//@ts-ignore
 	await execa('vrotsc', [
 		'src',
 		'--actionsNamespace', `${groupId}.${artifactId}`,
@@ -28,6 +29,6 @@ export default async function(args: CliOptions, artifactData: ArtifactData, watc
 		'--policiesOut', `${outFolder}/vro-sources/xml/src/main/resources/PolicyTemplate`,
 		'--resourcesOut', `${outFolder}/vro-sources/xml/src/main/resources/ResourceElement`,
 		'--configsOut', `${outFolder}/vro-sources/xml/src/main/resources/ConfigurationElement`
-	]);
-	logger.debug(`Finished running vrotsc. Took: ${(Date.now() - start) / 1000}s`);
+	]).pipeStderr(process.stderr).catch(e => e);
+	logger.info(`Finished running vrotsc. Took: ${(Date.now() - start) / 1000}s`);
 }

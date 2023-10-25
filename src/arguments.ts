@@ -8,6 +8,7 @@ export interface CliOptions {
 
 	help: boolean,
 	version: boolean,
+	verbosity: string,
 
 	watch: boolean,
 	watchMs: number,
@@ -39,6 +40,7 @@ export function parseArguments(): CliOptions {
 			// META
 			help: { type: Boolean, defaultValue: false, alias: "h", description: "Displays Help" },
 			version: { type: Boolean, defaultValue: false, alias: "v", description: "Current version of the tool" },
+			verbosity: { type: String, defaultValue: "info", description: "Logging verbosity: error, warn, info, http, verbose, debug, silly" },
 
 			// INIT
 			init: { type: Boolean, defaultValue: false, description: "Initialize NAT dependencies, downloads vrotsc and vropkg from maven central" },

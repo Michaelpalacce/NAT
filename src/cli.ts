@@ -1,11 +1,14 @@
 import { parseArguments } from "./arguments.js";
 import { initCmd, buildCmd, pushCmd, addConnectionCmd, testCmd, cleanCmd, watchCmd, versionCmd } from "./commands.js";
+import logger from "./logger/logger.js";
 
 /**
 * This contains all the CLI handling of NAT
 */
 export default async function() {
 	const args = parseArguments();
+
+	logger.level = args.verbosity;
 
 	if (args.version)
 		await versionCmd(args);

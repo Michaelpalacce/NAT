@@ -21,7 +21,7 @@ export default function(args: CliOptions) {
 		filesBuffer = [];
 
 		queue.add(async () => {
-			logger.verbose(`Compiling with filter: ${files}`);
+			logger.info(`Compiling with filter: ${files}`);
 			await vrotsc(args, await fetchArtifactData(process.cwd()), files);
 		});
 	}, args.watchMs);

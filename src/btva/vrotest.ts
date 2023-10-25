@@ -13,9 +13,9 @@ export default async function(args: CliOptions, artifactData: ArtifactData) {
 	const namespace = `${groupId}.${artifactId}`;
 
 	const start = Date.now();
-	logger.debug(`Running vrotest.`);
-	//@ts-ignore
-	const { stdout } = await execa('vrotest', [
+	logger.info(`Running vrotest.`);
+
+	await execa('vrotest', [
 		'build',
 		'--actions', `${outFolder}/vro-sources/js/src/main/resources`,
 		'--testHelpers', `${outFolder}/vro-sources/testHelpers/src/main/resources`,
@@ -31,6 +31,6 @@ export default async function(args: CliOptions, artifactData: ArtifactData) {
 	]);
 
 	//@ts-ignore
-	await execa('vrotest', ['run', `${outFolder}/vro-tests`]).pipeStdout(process.stdout).pipeStderr(process.stderr);
-	logger.debug(`Finished running vrotest. Took: ${(Date.now() - start) / 1000}s`);
+	await execa('vrotest', ['run', `${outFolder}/vro-tests`]).pipeStdout(process.stdout).pipeStderr(process.stderr).catch(e => e);
+	logger.info(`Finished running vrotest. Took: ${(Date.now() - start) / 1000}s`);
 }
