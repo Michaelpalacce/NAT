@@ -1,36 +1,27 @@
-import { CliOptions } from "../../arguments.js";
-import axios from "axios";
-import LoginClient from "../../clients/aria/LoginClient.js";
-import FormData from 'form-data';
 import { createReadStream } from "fs";
-import logger from "../../logger/logger.js";
-import { ArtifactData, fetchArtifactData, getPackageNameFromArtifactData } from "../../helpers/maven/artifact.js";
 import { join } from "path";
+import { CliOptions } from "../../arguments.js";
+import LoginClient from "../../clients/aria/LoginClient.js";
+import OrchestratorClient from "../../clients/aria/OrchestratorClient.js";
+import logger from "../../logger/logger.js";
+import { fetchArtifactData, getPackageNameFromArtifactData } from "../../helpers/maven/artifact.js";
 
+/*
+* Pushes the prepared package to Aria Orchestrator
+*/
 export default async function(args: CliOptions) {
 	logger.warn("Pushing is still in Beta, currently errors while importing are not really handled, you won't get a good message.");
+
 	const loginClient = await LoginClient.fromConnection(args.connection);
 	loginClient.setLoginInterceptorInInstance();
 
-	const artifactData: ArtifactData = await fetchArtifactData(process.cwd());
-
-	// Create a new form instance
-	const form = new FormData();
-
-	// TESTING
-	const packageName = getPackageNameFromArtifactData(artifactData);
+	const packageName = getPackageNameFromArtifactData(await fetchArtifactData(process.cwd()));
 	const location = join(process.cwd(), args.outFolder, 'vropkg', packageName);
 
-	form.append('file', createReadStream(location), packageName);
-	form.append('overwrite', 'true');
-	form.append('tagImportMode', 'ImportAndOverwriteExistingValue');
-	form.append('importConfigurationAttributeValues', 'false');
-	form.append('importConfigSecureStringAttributeValues', 'false');
+	const orchestratorClient = new OrchestratorClient(loginClient.getConfig());
+	const response = await orchestratorClient.importPackage(packageName, createReadStream(location));
 
-	logger.debug(`Going to upload: ${location}`);
-
-	const url = `https://${loginClient.getConfig().getUrl()}/vco/api/packages`;
-	const response = await axios.post(url, form, { headers: form.getHeaders() }).catch(e => e);
-	logger.info(response.data);
 	logger.info(`${packageName} uploaded`);
+	logger.info(`Status Code: ${response.status}`);
+	logger.info(response.data);
 }

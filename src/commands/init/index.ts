@@ -17,7 +17,7 @@ const untar = promisify(targz.decompress);
 export async function resetNatFolder() {
 	const natFolder = getNatConfigDir();
 
-	await Promise.all(['vrotsc', 'vropkg', 'keystore'].map(folder => new Promise<void>(async (resolve) => {
+	await Promise.all(['vrotsc', 'vropkg', 'vrotest', 'keystore'].map(folder => new Promise<void>(async (resolve) => {
 		const toDelete = join(natFolder, folder);
 		if (existsSync(toDelete))
 			await rm(toDelete, { recursive: true });
@@ -26,7 +26,6 @@ export async function resetNatFolder() {
 		resolve();
 	})));
 }
-
 
 /**
 * Sets the certificates for vropkg to use. They must be present on the FS.
@@ -113,56 +112,3 @@ export async function initDependencies(args: CliOptions) {
 	}
 }
 
-////////////////////////////////// Archive, may be useful /////////////////////////////////////////////
-//
-// import decompress from "decompress";
-// import { XMLParser } from "fast-xml-parser";
-//
-// export async function getPackagingProfile(args: CliOptions) {
-// 	const parser = new XMLParser();
-// 	const settingsXml = parser.parse<any>(await readFile(args.settingsXmlLocation));
-// 	const packagingProfile = settingsXml.settings.profiles.profile.find(p => p.id === args.packagingProfileId);
-//
-// 	if (!packagingProfile)
-// 		throw new Error(`No packaging profile with id: ${args.packagingProfileId} found in ${args.settingsXmlLocation}`);
-//
-// 	return packagingProfile;
-// }
-// /**
-// * Fetches the certificates based on artifactId and groupId and extracts them to the nat subdir... 
-// * @TODO: Make it work with local certificates
-// */
-// export async function initCertificatesBasedOnMaven(args: CliOptions) {
-// 	logger.info("Fetching certificates based on settings.xml.. Curently only supports fetching from the configured artifactory");
-// 	const packagingProfile = await getPackagingProfile(args);
-//
-// 	const natFolder = getNatConfigDir();
-// 	const keystoreModule = join(natFolder, 'keystore');
-//
-// 	const keystoreLocation = await download.default(
-// 		{
-// 			artifactId: packagingProfile.properties.keystoreArtifactId,
-// 			groupId: packagingProfile.properties.keystoreGroupId,
-// 			version: packagingProfile.properties.keystoreVersion,
-// 			extension: 'zip'
-// 		},
-// 		natFolder
-// 	);
-//
-// 	await decompress(keystoreLocation, keystoreModule);
-//
-// 	const keystoreSubDir = `${packagingProfile.properties.keystoreArtifactId}-${packagingProfile.properties.keystoreVersion}`;
-// 	await rename(
-// 		join(keystoreModule, keystoreSubDir, 'cert.pem'),
-// 		join(keystoreModule, 'cert.pem')
-// 	);
-//
-// 	await rename(
-// 		join(keystoreModule, keystoreSubDir, 'private_key.pem'),
-// 		join(keystoreModule, 'private_key.pem')
-// 	);
-//
-// 	await rm(join(keystoreModule, keystoreSubDir));
-// 	logger.info("Done fetching certificates based on settings.xml");
-// }
-//

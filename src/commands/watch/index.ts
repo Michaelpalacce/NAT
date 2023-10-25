@@ -33,7 +33,9 @@ export default function(args: CliOptions) {
 			filesBuffer.push(fileName);
 			onChangeCallback(fileName);
 		})
-		.on('add', function(path) { logger.warn(`File: ${path} has been added, not recompiling until changes have been detected`); })
+		.on('add', function(path) {
+			// Do nothing :)
+		})
 		.on('unlink', function(path) { logger.warn(`File: ${path} has been deleted, currently this is not handled, you should recompile with 'nat -b'`); })
 		.on('error', function(error) { logger.error(`Error: ${error}`); });
 }
