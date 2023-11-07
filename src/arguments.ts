@@ -34,7 +34,6 @@ export interface CliOptions {
 	deleteConnection: boolean;
 }
 
-
 /**
 * Parses the process.argv arguments based on the options provided
 */
