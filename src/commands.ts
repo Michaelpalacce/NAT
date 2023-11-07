@@ -3,7 +3,7 @@ import { initCertificates, initDependencies, resetNatFolder } from "./commands/i
 import ensureDirClean from "./helpers/fs/ensureDirClean.js";
 import vrotsc from "./btva/vrotsc.js";
 import vropkg from "./btva/vropkg.js";
-import { existsSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import { getConnectionsDir } from "./helpers/fs/locations.js";
 import { addConnection, getConnections, hasConnection } from "./commands/connection/index.js";
 import { ArtifactData, fetchArtifactData } from "./helpers/maven/artifact.js";
@@ -12,11 +12,20 @@ import push from "./commands/push/index.js";
 import inquirer from "inquirer";
 import vrotest from "./btva/vrotest.js";
 import watch from "./commands/watch/index.js";
+import { join, dirname } from "path";
 
-// import version from "../package.json";
+import { fileURLToPath } from 'url';
 
 export async function versionCmd(args: CliOptions) {
-	// console.log(version);
+	const __filename = fileURLToPath(import.meta.url);
+	const __dirname = dirname(__filename);
+	const packageJsonLocation = join(__dirname, "../package.json");
+
+	const packageJson = JSON.parse(
+		readFileSync(packageJsonLocation).toString()
+	);
+
+	console.log(`Version: ${packageJson.version}`);
 }
 
 /**
