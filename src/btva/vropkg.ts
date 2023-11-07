@@ -3,6 +3,7 @@ import { ArtifactData } from "../helpers/maven/artifact.js";
 import { CliOptions } from "../arguments.js";
 import logger from "../logger/logger.js";
 import { getCertificates } from "../helpers/fs/locations.js";
+import { readFile } from "fs/promises";
 
 /**
 * This method runs both vropkg tree and flat. This will package the entire solution to a .package file
@@ -23,7 +24,7 @@ export default async function(args: CliOptions, artifactData: ArtifactData) {
 		'--destPath', `${outFolder}/vro-sources/xml`,
 		'--privateKeyPEM', getCertificates().privateKeyPem,
 		'--certificatesPEM', getCertificates().certPem,
-		'--keyPass', 'VMware1!',
+		'--keyPass', (await readFile(getCertificates().certPass)).toString(),
 		'--version', version,
 		'--packaging', 'package',
 		'--artifactId', artifactId,
@@ -37,7 +38,7 @@ export default async function(args: CliOptions, artifactData: ArtifactData) {
 		'--destPath', `${outFolder}/vropkg`,
 		'--privateKeyPEM', getCertificates().privateKeyPem,
 		'--certificatesPEM', getCertificates().certPem,
-		'--keyPass', 'VMware1!',
+		'--keyPass', (await readFile(getCertificates().certPass)).toString(),
 		'--version', version,
 		'--packaging', 'package',
 		'--artifactId', artifactId,

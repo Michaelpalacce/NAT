@@ -1,5 +1,5 @@
 import download from 'mvn-artifact-download';
-import { copyFile, mkdir, rm } from "fs/promises";
+import { copyFile, mkdir, rm, writeFile } from "fs/promises";
 import targz from "targz";
 import { promisify } from "util";
 import { join } from 'path';
@@ -9,7 +9,10 @@ import logger from '../../logger/logger.js';
 import { existsSync } from 'fs';
 import { execa } from 'execa';
 import ensureDirExists from '../../helpers/fs/ensureDirExists.js';
+import inquirer from 'inquirer';
 const untar = promisify(targz.decompress);
+
+const DEFAULT_CERT_PASSWORD = "VMware1!";
 
 /**
 * Clears up the NAT folder so we can initialize again
@@ -55,8 +58,18 @@ export async function initCertificates(args: CliOptions) {
 
 	await ensureDirExists(keystoreModule);
 
+	const answers = await inquirer.prompt([
+		{
+			name: "password",
+			type: "password",
+			message: `Whats The password for the private key? [${DEFAULT_CERT_PASSWORD}]`,
+			default: DEFAULT_CERT_PASSWORD
+		}
+	]);
+
 	await copyFile(certLocation, getCertificates().certPem);
 	await copyFile(privateKeyLocation, getCertificates().privateKeyPem);
+	await writeFile(getCertificates().certPass, answers.password);
 
 	logger.info("Done setting up keystore");
 }
