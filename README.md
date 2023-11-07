@@ -63,8 +63,8 @@ in a separate terminal you can run `nat -p` to push the code when it completes o
 - [x] Pushing code
 - [x] Running Tests
 - [x] Save Artifact in memory so we don't read it twice
-- [ ] Improve Push Code Logic
-- [ ] Only push changed files for watch mode?
+- [x] Improve Push Code Logic
+- [x] Only push changed files for watch mode?
 - [ ] Code Coverage
 - [ ] Download dependencies and push them too
 - [ ] Definitions? 
