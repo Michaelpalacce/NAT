@@ -1,6 +1,3 @@
-
-// @TODO MOVE ALL Locations here :)
-
 import { homedir } from "os";
 import { join } from "path";
 

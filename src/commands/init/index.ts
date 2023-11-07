@@ -4,6 +4,7 @@ import targz from "targz";
 import { promisify } from "util";
 import { join } from 'path';
 import { CERT_PEM_NAME, PRIVATE_KEY_PEM_NAME, getCertificates, getKeystoreDir, getNatConfigDir } from '../../helpers/fs/locations.js';
+import { DEFAULT_CERT_PASSWORD } from "./defaults.js";
 import { CliOptions } from '../../arguments.js';
 import logger from '../../logger/logger.js';
 import { existsSync } from 'fs';
@@ -11,8 +12,6 @@ import { execa } from 'execa';
 import ensureDirExists from '../../helpers/fs/ensureDirExists.js';
 import inquirer from 'inquirer';
 const untar = promisify(targz.decompress);
-
-const DEFAULT_CERT_PASSWORD = "VMware1!";
 
 /**
 * Clears up the NAT folder so we can initialize again
