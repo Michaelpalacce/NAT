@@ -3,7 +3,7 @@ import { join } from "path";
 import { createWriteStream, existsSync } from "fs";
 import { readFile, writeFile } from "fs/promises";
 import logger from "../../logger/logger.js";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { getConfig } from "../config.js";
 import { getDependenciesDir } from "../fs/locations.js";
 
@@ -53,13 +53,22 @@ export async function downloadArtifact(artifact: Artifact, location?: string, fo
 	}
 
 	const config = getConfig();
-	const response = await axios.get(`${config?.repo?.url}/${getPathFromArtifact(artifact)}`, {
-		auth: {
-			username: config?.repo?.username,
-			password: config?.repo?.password
-		},
-		responseType: "stream"
-	});
+	const url = `${config?.repo?.url}/${getPathFromArtifact(artifact)}`;
+	logger.verbose(`Getting artifact from: ${url}`);
+	let response: AxiosResponse<any, any>;
+
+	try {
+		response = await axios.get(url, {
+			auth: {
+				username: config?.repo?.username,
+				password: config?.repo?.password
+			},
+			responseType: "stream"
+		});
+	}
+	catch (e) {
+		throw new Error(`Error trying to fetch artifact: ${url}. Error was: ${e}`);
+	}
 
 	const writer = createWriteStream(outLocation, { flags: "w" });
 	response.data.pipe(writer);
@@ -80,6 +89,30 @@ export async function readLockFile(lockFileLocation: string): Promise<string | n
 	const hasLock = existsSync(lockFileLocation);
 
 	return hasLock ? (await readFile(lockFileLocation)).toString() : null;
+}
+
+/**
+* Parses the pom and remaps it accordingly to Artifact interface
+*/
+export async function parsePomFile(filePath: string): Promise<Artifact> {
+	let pomResponse: any;
+
+	try {
+		pomResponse = await parsePom({ filePath });
+	}
+	catch (e) {
+		throw new Error(`POM: ${filePath} was not parsed successfully. Error was: ${e}`);
+	}
+
+	const project = pomResponse.pomObject.project;
+
+	return {
+		artifactid: project.artifactid,
+		groupid: project.groupid,
+		version: project.version,
+		type: project.packaging,
+		dependencies: project?.dependencies?.dependency
+	};
 }
 
 /**
@@ -108,28 +141,8 @@ export async function fetchProjectArtifactData(containingDir: string, force: boo
 		logger.debug(`Discovered existing artifact from ${ARTIFACT_LOCK_FILE_NAME}: ${JSON.stringify(artifact, null, 4)}`);
 	}
 	else {
-		logger.debug(`No ${ARTIFACT_LOCK_FILE_NAME} found, trying to parse the pom.xml`);
-		let pomResponse: any;
-
-		try {
-			pomResponse = await parsePom({
-				filePath: join(containingDir, "pom.xml")
-			});
-		}
-		catch (e) {
-			throw new Error(`No ${ARTIFACT_LOCK_FILE_NAME} found in ${containingDir} and pom.xml was not parsed successfully. Error was: ${e}`);
-		}
-
-		const project = pomResponse.pomObject.project;
-
-		artifact = {
-			artifactid: project.artifactid,
-			groupid: project.groupid,
-			version: project.version,
-			type: project.packaging,
-			dependencies: pomResponse.pomObject.project.dependencies.dependency
-		};
-
+		logger.debug(`NO ${ARTIFACT_LOCK_FILE_NAME} found, parsing pom.xml`);
+		artifact = await parsePomFile(join(containingDir, "pom.xml"));
 		const body = JSON.stringify(artifact, null, 4);
 
 		logger.debug(`Extracted ArtifactData: ${body}`);
@@ -139,3 +152,4 @@ export async function fetchProjectArtifactData(containingDir: string, force: boo
 	logger.debug("Done fetching artifact data");
 	return artifact;
 }
+

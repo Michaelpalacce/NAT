@@ -1,5 +1,4 @@
 import { copyFile, mkdir, rm, writeFile } from "fs/promises";
-import targz from "targz";
 import { promisify } from "util";
 import { join } from 'path';
 import { CERT_PEM_NAME, PRIVATE_KEY_PEM_NAME, getCertificates, getKeystoreDir, getNatConfig, getNatConfigDir } from '../../helpers/fs/locations.js';
@@ -11,6 +10,7 @@ import { execa } from 'execa';
 import ensureDirExists from '../../helpers/fs/ensureDirExists.js';
 import inquirer from 'inquirer';
 import { downloadArtifact } from "../../helpers/maven/artifact.js";
+import targz from "targz";
 const untar = promisify(targz.decompress);
 
 /**

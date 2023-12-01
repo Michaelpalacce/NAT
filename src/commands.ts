@@ -71,7 +71,7 @@ export async function dependenciesCmd(args: CliOptions) {
 	const start = Date.now();
 	const artifactData: Artifact = await fetchProjectArtifactData(process.cwd());
 
-	fetchDependencies(args, artifactData);
+	await fetchDependencies(args, artifactData);
 
 	logger.verbose(`Done setting up dependencies: Took: ${(Date.now() - start) / 1000}s`);
 }
