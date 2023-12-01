@@ -64,7 +64,6 @@ export default class LoginClient {
 				return Promise.reject(error);
 
 			const status = error.response ? error.response.status : null;
-			console.log(status);
 
 			if (status === 401) {
 				this.token = null;

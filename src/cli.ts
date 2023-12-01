@@ -11,30 +11,31 @@ export default async function() {
 	logger.level = args.verbosity;
 
 
-	// if (args.version)
-	// 	await versionCmd(args);
-	//
+	if (args.version)
+		await versionCmd(args);
+
 	if (args.init)
 		await initCmd(args);
 
-	await dependenciesCmd(args);
+	if (args.addConnection)
+		await addConnectionCmd(args);
 
-	// if (args.addConnection)
-	// 	await addConnectionCmd(args);
-	//
-	// if (args.clean)
-	// 	await cleanCmd(args);
-	//
-	// if (args.build || args.watch)
-	// 	await buildCmd(args);
-	//
-	// if (args.watch)
-	// 	await watchCmd(args);
-	//
-	// if (args.test)
-	// 	await testCmd(args);
-	//
-	// if (args.push)
-	// 	await pushCmd(args);
+	if (args.clean)
+		await cleanCmd(args);
+
+	if (args.dependencies)
+		await dependenciesCmd(args);
+
+	if (args.build || args.watch)
+		await buildCmd(args);
+
+	if (args.watch)
+		await watchCmd(args);
+
+	if (args.test)
+		await testCmd(args);
+
+	if (args.push)
+		await pushCmd(args);
 }
 

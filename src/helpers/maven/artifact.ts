@@ -48,7 +48,7 @@ export async function downloadArtifact(artifact: Artifact, location?: string, fo
 	}
 
 	if (existsSync(outLocation) && !force) {
-		logger.info(`Artifact: ${artifactName} already exists, skipping`);
+		logger.debug(`Artifact: ${artifactName} already exists, skipping`);
 		return outLocation;
 	}
 
@@ -75,7 +75,7 @@ export async function downloadArtifact(artifact: Artifact, location?: string, fo
 
 	return new Promise((resolve, reject) => {
 		writer.on('finish', () => {
-			logger.info(`Artifact: ${artifactName} downloaded`);
+			logger.debug(`Artifact: ${artifactName} downloaded`);
 			resolve(outLocation);
 		});
 		writer.on('error', reject);
