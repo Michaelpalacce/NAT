@@ -1,14 +1,14 @@
 import { execa } from "execa";
-import { ArtifactData } from "../helpers/maven/artifact.js";
+import { Artifact } from "../helpers/maven/artifact.js";
 import { CliOptions } from "../arguments.js";
 import logger from "../logger/logger.js";
 
 /**
 * This will run vrotest, used to running unit tests
 */
-export default async function(args: CliOptions, artifactData: ArtifactData) {
+export default async function(args: CliOptions, artifactData: Artifact) {
 	const { outFolder } = args;
-	const { artifactId, groupId } = artifactData;
+	const { artifactid: artifactId, groupid: groupId } = artifactData;
 
 	const namespace = `${groupId}.${artifactId}`;
 

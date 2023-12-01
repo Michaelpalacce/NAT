@@ -1,16 +1,16 @@
-import download from 'mvn-artifact-download';
 import { copyFile, mkdir, rm, writeFile } from "fs/promises";
 import targz from "targz";
 import { promisify } from "util";
 import { join } from 'path';
-import { CERT_PEM_NAME, PRIVATE_KEY_PEM_NAME, getCertificates, getKeystoreDir, getNatConfigDir } from '../../helpers/fs/locations.js';
+import { CERT_PEM_NAME, PRIVATE_KEY_PEM_NAME, getCertificates, getKeystoreDir, getNatConfig, getNatConfigDir } from '../../helpers/fs/locations.js';
 import { DEFAULT_CERT_PASSWORD } from "./defaults.js";
 import { CliOptions } from '../../arguments.js';
 import logger from '../../logger/logger.js';
-import { existsSync } from 'fs';
+import { existsSync, writeFileSync } from 'fs';
 import { execa } from 'execa';
 import ensureDirExists from '../../helpers/fs/ensureDirExists.js';
 import inquirer from 'inquirer';
+import { downloadArtifact } from "../../helpers/maven/artifact.js";
 const untar = promisify(targz.decompress);
 
 /**
@@ -19,7 +19,7 @@ const untar = promisify(targz.decompress);
 export async function resetNatFolder() {
 	const natFolder = getNatConfigDir();
 
-	await Promise.all(['vrotsc', 'vropkg', 'vrotest', 'keystore'].map(folder => new Promise<void>(async (resolve) => {
+	await Promise.all(['vrotsc', 'vropkg', 'vrotest', 'keystore', "dependencies"].map(folder => new Promise<void>(async (resolve) => {
 		const toDelete = join(natFolder, folder);
 		if (existsSync(toDelete))
 			await rm(toDelete, { recursive: true });
@@ -89,12 +89,12 @@ async function initNodeDependency(args: CliOptions, dependencyName: string) {
 	const moduleLocation = join(natFolder, dependencyName);
 
 	logger.debug(`Downloading ${dependencyName}`);
-	const artifactLocation = await download.default(
+	const artifactLocation = await downloadArtifact(
 		{
-			artifactId: dependencyName,
-			groupId: "com.vmware.pscoe.iac",
+			artifactid: dependencyName,
+			groupid: "com.vmware.pscoe.iac",
 			version: btvaVersion,
-			extension: "tgz"
+			type: "tgz"
 		},
 		natFolder
 	);
@@ -124,3 +124,34 @@ export async function initDependencies(args: CliOptions) {
 	}
 }
 
+/**
+* Initializes the config.json file in ~/.nat
+* This configuration stores for now just repo data
+* TODO: Think about moving all config here ?
+*/
+export async function initConfiguration(args: CliOptions) {
+	const repoAnswers = await inquirer.prompt([
+		{
+			name: "url",
+			type: "text",
+			message: `What is the maven repository url? (Without trailing '/')`,
+		},
+		{
+			name: "username",
+			type: "text",
+			message: `What is the username for the repo?`,
+		},
+		{
+			name: "password",
+			type: "password",
+			message: `What is the password for the repo?`,
+		},
+	]);
+
+	const configDir = getNatConfig();
+	const config = {
+		repo: repoAnswers
+	};
+
+	writeFileSync(configDir, JSON.stringify(config));
+}

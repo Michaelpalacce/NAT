@@ -1,5 +1,5 @@
 import { execa } from "execa";
-import { ArtifactData } from "../helpers/maven/artifact.js";
+import { Artifact } from "../helpers/maven/artifact.js";
 import { CliOptions } from "../arguments.js";
 import logger from "../logger/logger.js";
 import { getCertificates } from "../helpers/fs/locations.js";
@@ -8,9 +8,9 @@ import { readFile } from "fs/promises";
 /**
 * This method runs both vropkg tree and flat. This will package the entire solution to a .package file
 */
-export default async function(args: CliOptions, artifactData: ArtifactData) {
+export default async function(args: CliOptions, artifactData: Artifact) {
 	const { outFolder } = args;
-	const { artifactId, groupId, version } = artifactData;
+	const { artifactid: artifactId, groupid: groupId, version } = artifactData;
 	const start = Date.now();
 	const password = (await readFile(getCertificates().certPass)).toString();
 

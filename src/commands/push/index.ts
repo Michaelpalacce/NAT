@@ -4,7 +4,7 @@ import { CliOptions } from "../../arguments.js";
 import LoginClient from "../../clients/aria/LoginClient.js";
 import OrchestratorClient from "../../clients/aria/OrchestratorClient.js";
 import logger from "../../logger/logger.js";
-import { fetchArtifactData, getPackageNameFromArtifactData } from "../../helpers/maven/artifact.js";
+import { fetchProjectArtifactData, getPackageNameFromArtifactData } from "../../helpers/maven/artifact.js";
 
 /*
 * Pushes the prepared package to Aria Orchestrator
@@ -15,7 +15,7 @@ export default async function(args: CliOptions) {
 	const loginClient = await LoginClient.fromConnection(args.connection);
 	loginClient.setLoginInterceptorInInstance();
 
-	const packageName = getPackageNameFromArtifactData(await fetchArtifactData(process.cwd()));
+	const packageName = getPackageNameFromArtifactData(await fetchProjectArtifactData(process.cwd()));
 	const location = join(process.cwd(), args.outFolder, 'vropkg', packageName);
 
 	const orchestratorClient = new OrchestratorClient(loginClient.getConfig());

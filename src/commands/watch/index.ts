@@ -5,7 +5,7 @@ import debounce from "../../helpers/debounce.js";
 import { CliOptions } from "../../arguments.js";
 import logger from "../../logger/logger.js";
 import vrotsc from "../../btva/vrotsc.js";
-import { fetchArtifactData } from "../../helpers/maven/artifact.js";
+import { fetchProjectArtifactData } from "../../helpers/maven/artifact.js";
 
 /**
 * Watches for changes in the `src` folder.
@@ -22,7 +22,7 @@ export default function(args: CliOptions) {
 
 		queue.add(async () => {
 			logger.info(`Compiling with filter: ${files}`);
-			await vrotsc(args, await fetchArtifactData(process.cwd()), files);
+			await vrotsc(args, await fetchProjectArtifactData(process.cwd()), files);
 		});
 	}, args.watchMs);
 

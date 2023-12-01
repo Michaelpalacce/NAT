@@ -1,17 +1,18 @@
 import { CliOptions } from "./arguments.js";
-import { initCertificates, initDependencies, resetNatFolder } from "./commands/init/index.js";
+import { initConfiguration, initCertificates, initDependencies, resetNatFolder } from "./commands/init/index.js";
 import ensureDirClean from "./helpers/fs/ensureDirClean.js";
 import vrotsc from "./btva/vrotsc.js";
 import vropkg from "./btva/vropkg.js";
 import { existsSync, readFileSync } from "fs";
 import { getConnectionsDir } from "./helpers/fs/locations.js";
 import { addConnection, getConnections, hasConnection } from "./commands/connection/index.js";
-import { ArtifactData, fetchArtifactData } from "./helpers/maven/artifact.js";
+import { Artifact, fetchProjectArtifactData } from "./helpers/maven/artifact.js";
 import logger from "./logger/logger.js";
 import push from "./commands/push/index.js";
 import inquirer from "inquirer";
 import vrotest from "./btva/vrotest.js";
 import watch from "./commands/watch/index.js";
+import { fetchDependencies } from "./commands/dependencies/index.js";
 import { join, dirname } from "path";
 
 import { fileURLToPath } from 'url';
@@ -35,6 +36,7 @@ export async function initCmd(args: CliOptions) {
 	logger.verbose("Initializing NAT");
 
 	await resetNatFolder();
+	await initConfiguration(args);
 	await initDependencies(args);
 	await initCertificates(args);
 
@@ -58,6 +60,21 @@ export async function cleanCmd(args: CliOptions) {
 	logger.verbose(`Done cleaning: ${outFolder}`);
 }
 
+/**
+* Fetches project dependencies.
+* This will download both `.package` files and `.tgz`files.
+* - `.package` - puts them in the NAT out dir.
+* - `.tgz` - extracts them and puts them in the node_modules folder
+*/
+export async function dependenciesCmd(args: CliOptions) {
+	logger.verbose("Dependencies");
+	const start = Date.now();
+	const artifactData: Artifact = await fetchProjectArtifactData(process.cwd());
+
+	fetchDependencies(args, artifactData);
+
+	logger.verbose(`Done setting up dependencies: Took: ${(Date.now() - start) / 1000}s`);
+}
 
 /**
 * Compiles the project with vrotsc. TS -> JS
@@ -79,7 +96,7 @@ export async function testCmd(args: CliOptions) {
 	logger.verbose("Running tests");
 	const start = Date.now();
 
-	await vrotest(args, await fetchArtifactData(process.cwd()));
+	await vrotest(args, await fetchProjectArtifactData(process.cwd()));
 
 	logger.verbose(`Finished with tests: Took: ${(Date.now() - start) / 1000}s`);
 }
@@ -144,7 +161,7 @@ export async function watchCmd(args: CliOptions) {
 * Fetches artifact data, stores it in a lock file and returns it. Alternatively if the lock file exists, fetches it from there
 */
 async function vrotscCmd(args: CliOptions) {
-	const artifactData: ArtifactData = await fetchArtifactData(process.cwd());
+	const artifactData: Artifact = await fetchProjectArtifactData(process.cwd());
 
 	if (!args.files) {
 		await cleanCmd(args);
@@ -160,7 +177,7 @@ async function vrotscCmd(args: CliOptions) {
 async function vropkgCmd(args: CliOptions) {
 	const cwd = process.cwd();
 
-	const artifactData: ArtifactData = await fetchArtifactData(cwd);
+	const artifactData: Artifact = await fetchProjectArtifactData(cwd);
 
 	await vropkg(args, artifactData);
 }

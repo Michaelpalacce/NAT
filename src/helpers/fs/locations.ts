@@ -5,17 +5,8 @@ export const PRIVATE_KEY_PEM_NAME = 'private_key.pem';
 export const CERT_PEM_NAME = 'cert.pem';
 export const CERT_PASS_NAME = 'cert.pass';
 
-
 export function getHomedir() {
 	return homedir();
-}
-
-/**
-* The default settings.xml location 
-* NOTE: Is an input, but it shouldn't be needed in the future....
-*/
-export function getSettingsXmlLocation() {
-	return join(getHomedir(), ".m2", "settings.xml");
 }
 
 /**
@@ -23,6 +14,10 @@ export function getSettingsXmlLocation() {
 */
 export function getNatConfigDir() {
 	return join(getHomedir(), ".nat");
+}
+
+export function getNatConfig() {
+	return join(getNatConfigDir(), "config.json");
 }
 
 /**
@@ -49,3 +44,11 @@ export function getCertificates() {
 		certPass: join(getKeystoreDir(), CERT_PASS_NAME)
 	};
 }
+
+/** 
+* Returns the folder where all the dependencies are downloaded and extracted from
+*/
+export function getDependenciesDir() {
+	return join(getNatConfigDir(), "dependencies");
+}
+

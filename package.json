@@ -22,7 +22,6 @@
 		"form-data": "^4.0.0",
 		"inquirer": "^9.2.11",
 		"lodash.camelcase": "^4.3.0",
-		"mvn-artifact-download": "^6.1.1",
 		"pom-parser": "^1.2.0",
 		"targz": "^1.0.1",
 		"ts-command-line-args": "^2.5.1",
