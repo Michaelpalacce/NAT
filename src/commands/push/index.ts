@@ -1,4 +1,4 @@
-import { createReadStream } from "fs";
+import { createReadStream, readdirSync } from "fs";
 import { join } from "path";
 import { CliOptions } from "../../arguments.js";
 import LoginClient from "../../clients/aria/LoginClient.js";
@@ -25,4 +25,18 @@ export default async function(args: CliOptions) {
 	logger.info(`${packageName} uploaded`);
 	logger.info(`Status Code: ${response.status}`);
 	logger.info(response.data);
+
+	const dependenciesPath = join(process.cwd(), args.outFolder, 'dependency');
+
+	const depContents = readdirSync(dependenciesPath);
+	for (const item of depContents) {
+		const itemPath = join(dependenciesPath, item);
+
+		const response = await orchestratorClient.importPackage(item, createReadStream(itemPath));
+
+		logger.info(`${packageName} uploaded`);
+		logger.info(`Status Code: ${response.status}`);
+		logger.info(response.data);
+	}
+
 }
