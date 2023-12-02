@@ -8,6 +8,7 @@ import { fetchProjectArtifactData, getPackageNameFromArtifactData } from "../../
 
 /*
 * Pushes the prepared package to Aria Orchestrator
+* @TODO: PUSH DEPS :)
 */
 export default async function(args: CliOptions) {
 	logger.warn("Pushing is still in Beta, currently errors while importing are not really handled, you won't get a good message.");

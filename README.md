@@ -45,13 +45,13 @@ This will test the code. You must have built it beforehand (or you can add `-b` 
 
 In one terminal:
 ```
-nat --watch
+nat --watch --watchMs 1000
 ```
 Will build the code and start recompiling only the changed file.
 
 in a separate terminal you can run `nat -p` to push the code when it completes or even `nat -t` to run unit tests
 
-## Improvements
+## Roadmap
 
 - [x] Better Certificate Handling. Certificates should only work with local paths.
 - [x] Better vrotsc/vropkg installation
@@ -65,9 +65,10 @@ in a separate terminal you can run `nat -p` to push the code when it completes o
 - [x] Save Artifact in memory so we don't read it twice
 - [x] Improve Push Code Logic
 - [x] Only push changed files for watch mode?
+- [x] Download dependencies
+- [x] Definitions
 - [ ] Code Coverage
-- [ ] Download dependencies and push them too
-- [ ] Definitions? 
+- [ ] Push Dependencies
 - [ ] Don't rely on vrotsc, vropkg and vrotest from maven central
 
 ## Development
