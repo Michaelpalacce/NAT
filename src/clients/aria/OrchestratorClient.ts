@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import Configuration from "../configuration.js";
 import FormData from "form-data";
 import { ReadStream } from "fs";
@@ -9,7 +9,7 @@ export default class OrchestratorClient {
 	/**
 	* Imports the given readstream. The name of the package must also be provided
 	*/
-	public async importPackage(packageName: string, file: ReadStream) {
+	public async importPackage(packageName: string, file: ReadStream): Promise<AxiosResponse<any, any>> {
 		// Create a new form instance
 		const form = new FormData();
 

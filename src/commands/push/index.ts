@@ -8,7 +8,6 @@ import { fetchProjectArtifactData, getPackageNameFromArtifactData } from "../../
 
 /*
 * Pushes the prepared package to Aria Orchestrator
-* @TODO: PUSH DEPS :)
 */
 export default async function(args: CliOptions) {
 	logger.warn("Pushing is still in Beta, currently errors while importing are not really handled, you won't get a good message.");
@@ -26,17 +25,18 @@ export default async function(args: CliOptions) {
 	logger.info(`Status Code: ${response.status}`);
 	logger.info(response.data);
 
-	const dependenciesPath = join(process.cwd(), args.outFolder, 'dependency');
+	if (args.dependencies) {
+		const dependenciesPath = join(process.cwd(), args.outFolder, 'dependency');
 
-	const depContents = readdirSync(dependenciesPath);
-	for (const item of depContents) {
-		const itemPath = join(dependenciesPath, item);
+		const depContents = readdirSync(dependenciesPath);
+		for (const item of depContents) {
+			const itemPath = join(dependenciesPath, item);
 
-		const response = await orchestratorClient.importPackage(item, createReadStream(itemPath));
+			const response = await orchestratorClient.importPackage(item, createReadStream(itemPath));
 
-		logger.info(`${packageName} uploaded`);
-		logger.info(`Status Code: ${response.status}`);
-		logger.info(response.data);
+			logger.info(`${packageName} uploaded`);
+			logger.info(`Status Code: ${response.status}`);
+			logger.info(response.data);
+		}
 	}
-
 }

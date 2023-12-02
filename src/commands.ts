@@ -17,6 +17,9 @@ import { join, dirname } from "path";
 
 import { fileURLToPath } from 'url';
 
+/**
+* Display the version to the user
+*/
 export async function versionCmd(args: CliOptions) {
 	const __filename = fileURLToPath(import.meta.url);
 	const __dirname = dirname(__filename);
