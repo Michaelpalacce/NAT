@@ -37,22 +37,23 @@ export function getPackageNameFromArtifactData(artifactData: Artifact) {
 
 /**
 * Helper function to download artifacts from maven artifactories
+* This will take the config settings, one of them for caching will be taken too, to determine if we should keep artifacts
 * @param artifact The artifact to download
-* @param [force=false] Defines whether we should force download a new version.
 */
-export async function downloadArtifact(artifact: Artifact, location?: string, force: boolean = false): Promise<string> {
+export async function downloadArtifact(artifact: Artifact, location?: string): Promise<string> {
 	const artifactName = getPackageNameFromArtifactData(artifact);
 	let outLocation = join(getDependenciesDir(), artifactName);
 	if (location) {
 		outLocation = join(location, artifactName);
 	}
+	const config = getConfig();
+	const cache = config?.repo?.cache || false;
 
-	if (existsSync(outLocation) && !force) {
+	if (existsSync(outLocation) && cache) {
 		logger.debug(`Artifact: ${artifactName} already exists, skipping`);
 		return outLocation;
 	}
 
-	const config = getConfig();
 	const url = `${config?.repo?.url}/${getPathFromArtifact(artifact)}`;
 	logger.verbose(`Getting artifact from: ${url}`);
 	let response: AxiosResponse<any, any>;

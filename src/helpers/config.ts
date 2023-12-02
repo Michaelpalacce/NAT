@@ -6,7 +6,8 @@ export interface Config {
 		url: string,
 		username: string,
 		password: string;
-	};
+		cache: boolean;
+	},
 }
 
 let config: Config;

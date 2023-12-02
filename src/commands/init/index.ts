@@ -146,6 +146,13 @@ export async function initConfiguration(args: CliOptions) {
 			type: "password",
 			message: `What is the password for the repo?`,
 		},
+		{
+			name: "cache",
+			type: "boolean",
+			message: "Should we cache artifacts? This will significantly improve performance, to no cost.",
+			default: true
+		},
+
 	]);
 
 	const configDir = getNatConfig();

@@ -133,7 +133,8 @@ async function handlePackages(args: CliOptions, artifactLocation: string, artifa
 }
 
 /**
-* Handler for artifacts of type tgz
+* Handler for artifacts of type tgz.
+* After extraction, we have to move them since they get extracted to an extra "package" directory
 */
 async function handleTypeDefs(artifactLocation: string, artifact: Artifact, overwriteName?: string) {
 	const name = overwriteName || `${artifact.groupid}.${artifact.artifactid}`;
