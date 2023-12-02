@@ -3,7 +3,7 @@ import { CliOptions } from "../../arguments.js";
 import { Artifact, downloadArtifact, getPackageNameFromArtifactData, parsePomFile } from "../../helpers/maven/artifact.js";
 import targz from "targz";
 import logger from "../../logger/logger.js";
-import { copyFile, mkdir, rename } from "fs/promises";
+import { copyFile, cp, mkdir, rm } from "fs/promises";
 import { promisify } from "util";
 import { existsSync } from "fs";
 const untar = promisify(targz.decompress);
@@ -63,7 +63,7 @@ export async function fetchBtvaTypes(args: CliOptions) {
 
 				try {
 					const artifactLocation = await downloadArtifact(type);
-					await handleTypeDefs(artifactLocation, type);
+					await handleTypeDefs(artifactLocation, type, artifactName);
 				}
 				catch (error) {
 					logger.warn(`Skipping... Could not download ${artifactName}, reason: ${error}`);
@@ -135,14 +135,23 @@ async function handlePackages(args: CliOptions, artifactLocation: string, artifa
 /**
 * Handler for artifacts of type tgz
 */
-async function handleTypeDefs(artifactLocation: string, artifact: Artifact) {
-	const outDir = join(process.cwd(), "node_modules", "@types", `${artifact.groupid}.${artifact.artifactid}`);
+async function handleTypeDefs(artifactLocation: string, artifact: Artifact, overwriteName?: string) {
+	const name = overwriteName || `${artifact.groupid}.${artifact.artifactid}`;
+	const outDir = join(process.cwd(), "node_modules", "@types", name);
 
 	logger.debug(`Decompressing ${artifactLocation} to ${outDir}`);
 	await untar({
 		src: artifactLocation,
 		dest: outDir
 	});
+
+	const packageFolderPath = join(outDir, 'package');
+
+	if (existsSync(packageFolderPath)) {
+		await cp(`${packageFolderPath}/`, outDir, { recursive: true });
+
+		await rm(packageFolderPath, { recursive: true });
+	}
 }
 
 /**
