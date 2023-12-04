@@ -67,6 +67,7 @@ in a separate terminal you can run `nat -p` to push the code when it completes o
 - [x] Only push changed files for watch mode?
 - [x] Download dependencies
 - [x] Definitions
+- [ ] Improved Dependency pulling for snapshots. Currently I don't parse the maven-metadata... but also like MEH, it'll be so damn slow 
 - [ ] Code Coverage
 - [ ] Push Dependencies
 - [ ] Don't rely on vrotsc, vropkg and vrotest from maven central
