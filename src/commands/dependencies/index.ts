@@ -7,10 +7,7 @@ import { copyFile, cp, mkdir, rm } from "fs/promises";
 import { promisify } from "util";
 import { existsSync, readFileSync } from "fs";
 const untar = promisify(targz.decompress);
-
-import pomParser from "pom-parser";
 import { parseStringPromise } from 'xml2js';
-const parsePom = promisify(pomParser.parse);
 
 /**
 * Given an artifact with defined dependencies, fetches nested dependencies and then extracts them to the correct place
@@ -118,30 +115,33 @@ export async function findPomVersion(dependency: Artifact) {
 * Populates the artifact with it's nested dependencies by fetching the maven-metadata.xml and parsing it
 */
 export async function populateArtifactDependencies(args: CliOptions, artifact: Artifact) {
-	if (artifact.dependencies) {
-		for (const index in artifact.dependencies) {
-			const dependency = artifact.dependencies[index];
-			let name: string = "";
+	if (!artifact.dependencies) {
+		return;
+	}
 
-			try {
-				name = await findPomVersion(dependency);
-			} catch (error) {
-				logger.verbose(`Could not download maven-metadata.xml for ${dependency.artifactid}, reason: ${error}. Trying pom.xml instead`);
-			}
+	for (const index in artifact.dependencies) {
+		const dependency = artifact.dependencies[index];
+		let name: string = "";
 
-			const depPom = await downloadArtifact({
-				artifactid: dependency.artifactid,
-				groupid: dependency.groupid,
-				version: dependency.version,
-				name: name,
-				type: "pom"
-			});
+		try {
+			name = await findPomVersion(dependency);
+		} catch (error) {
+			logger.verbose(`Could not download maven-metadata.xml for ${dependency.artifactid}, reason: ${error}. Trying pom.xml instead`);
+		}
 
-			const depArtifact = await parsePomFile(depPom);
-			dependency.dependencies = depArtifact.dependencies;
-			if (dependency.dependencies) {
-				await populateArtifactDependencies(args, dependency);
-			}
+		const depPom = await downloadArtifact({
+			artifactid: dependency.artifactid,
+			groupid: dependency.groupid,
+			version: dependency.version,
+			// If we found a pom version, use that, otherwise use the default
+			name: name,
+			type: "pom"
+		});
+
+		const depArtifact = await parsePomFile(depPom);
+		dependency.dependencies = depArtifact.dependencies;
+		if (dependency.dependencies) {
+			await populateArtifactDependencies(args, dependency);
 		}
 	}
 }
