@@ -11,21 +11,34 @@ import pomParser from "pom-parser";
 const parsePom = promisify(pomParser.parse);
 const ARTIFACT_LOCK_FILE_NAME = 'nat.lock';
 
+export const MAVEN_METADATA_FILE_NAME = "maven-metadata.xml";
+
 let artifact: Artifact;
 
 export interface Artifact {
 	version: string,
 	artifactid: string,
 	groupid: string,
+	// This is optionally used to override the groupid, artifactid and version
+	name?: string,
 	type?: string,
 	dependencies?: Artifact[];
 }
 
 /*
 * This will return the repo path for the maven artifact.
+* artifact.name will override the groupid, artifactid and version
 */
 export function getPathFromArtifact(artifact: Artifact) {
-	return `${artifact.groupid.replaceAll(".", "/")}/${artifact.artifactid}/${artifact.version}/${artifact.artifactid}-${artifact.version}.${artifact.type || 'package'}`;
+	const name = artifact.name || `${artifact.artifactid}-${artifact.version}`;
+	return `${artifact.groupid.replaceAll(".", "/")}/${artifact.artifactid}/${artifact.version}/${name}.${artifact.type || 'package'}`;
+}
+
+/*
+* This will return the repo path for the maven artifact.
+*/
+export function getMavenMetadataPathFromArtifact(artifact: Artifact) {
+	return `${artifact.groupid.replaceAll(".", "/")}/${artifact.artifactid}/${artifact.version}/${MAVEN_METADATA_FILE_NAME}`;
 }
 
 /**
@@ -36,8 +49,22 @@ export function getPackageNameFromArtifactData(artifactData: Artifact) {
 }
 
 /**
+* Helper function to download maven metadata from maven artifactories
+*/
+export async function downloadMavenMetadata(artifact: Artifact) {
+	return await downloadArtifact({
+		artifactid: artifact.artifactid,
+		groupid: artifact.groupid,
+		version: artifact.version,
+		type: MAVEN_METADATA_FILE_NAME
+	});
+}
+
+/**
 * Helper function to download artifacts from maven artifactories
 * This will take the config settings, one of them for caching will be taken too, to determine if we should keep artifacts
+* If the artifact type is maven-metadata.xml, it will download the metadata file instead
+*
 * @param artifact The artifact to download
 */
 export async function downloadArtifact(artifact: Artifact, location?: string): Promise<string> {
@@ -54,7 +81,11 @@ export async function downloadArtifact(artifact: Artifact, location?: string): P
 		return outLocation;
 	}
 
-	const url = `${config?.repo?.url}/${getPathFromArtifact(artifact)}`;
+	let url = `${config?.repo?.url}/${getPathFromArtifact(artifact)}`;
+	if (artifact.type == MAVEN_METADATA_FILE_NAME) {
+		url = `${config?.repo?.url}/${getMavenMetadataPathFromArtifact(artifact)}`;
+	}
+
 	logger.verbose(`Getting artifact from: ${url}`);
 	let response: AxiosResponse<any, any>;
 

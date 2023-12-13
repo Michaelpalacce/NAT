@@ -1,12 +1,16 @@
 import { dirname, join } from "path";
 import { CliOptions } from "../../arguments.js";
-import { Artifact, downloadArtifact, getPackageNameFromArtifactData, parsePomFile } from "../../helpers/maven/artifact.js";
+import { Artifact, MAVEN_METADATA_FILE_NAME, downloadArtifact, downloadMavenMetadata, getPackageNameFromArtifactData, parsePomFile } from "../../helpers/maven/artifact.js";
 import targz from "targz";
 import logger from "../../logger/logger.js";
 import { copyFile, cp, mkdir, rm } from "fs/promises";
 import { promisify } from "util";
-import { existsSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 const untar = promisify(targz.decompress);
+
+import pomParser from "pom-parser";
+import { parseStringPromise } from 'xml2js';
+const parsePom = promisify(pomParser.parse);
 
 /**
 * Given an artifact with defined dependencies, fetches nested dependencies and then extracts them to the correct place
@@ -74,18 +78,63 @@ export async function fetchBtvaTypes(args: CliOptions) {
 }
 
 /**
-* Populates the artifact with it's nested dependencies by fetching pom files
+* Finds the latest pom version for a given dependency
+*
+* @param dependency - The dependency to find the pom version for
+*/
+export async function findPomVersion(dependency: Artifact) {
+	const metadata = await downloadMavenMetadata({
+		artifactid: dependency.artifactid,
+		groupid: dependency.groupid,
+		version: dependency.version
+	});
+
+	const result = await parseStringPromise(readFileSync(metadata));
+
+	// @TODO: Solve me :/
+	if (!dependency.version.includes('SNAPSHOT')) {
+		throw new Error(`Dependency ${dependency.artifactid} is not a snapshot version, dunno how to deal with that yet`);
+	}
+
+	let pomVersion: string = "";
+
+	// find the latest pom version
+	for (const index in result?.metadata?.versioning?.[0]?.snapshotVersions?.[0]?.snapshotVersion) {
+		const snapshotVersion = result?.metadata?.versioning?.[0]?.snapshotVersions?.[0]?.snapshotVersion?.[index];
+		if (snapshotVersion?.extension?.[0] == 'pom') {
+			pomVersion = snapshotVersion?.value;
+			break;
+		}
+	}
+
+	if (!pomVersion) {
+		throw new Error(`Could not find pom version for ${dependency.artifactid}`);
+	}
+
+	return `${dependency.artifactid}-${pomVersion}`;
+}
+
+/**
+* Populates the artifact with it's nested dependencies by fetching the maven-metadata.xml and parsing it
 */
 export async function populateArtifactDependencies(args: CliOptions, artifact: Artifact) {
 	if (artifact.dependencies) {
 		for (const index in artifact.dependencies) {
 			const dependency = artifact.dependencies[index];
+			let name: string = "";
+
+			try {
+				name = await findPomVersion(dependency);
+			} catch (error) {
+				logger.verbose(`Could not download maven-metadata.xml for ${dependency.artifactid}, reason: ${error}. Trying pom.xml instead`);
+			}
 
 			const depPom = await downloadArtifact({
 				artifactid: dependency.artifactid,
 				groupid: dependency.groupid,
-				type: "pom",
-				version: dependency.version
+				version: dependency.version,
+				name: name,
+				type: "pom"
 			});
 
 			const depArtifact = await parsePomFile(depPom);

@@ -130,6 +130,12 @@ export async function initDependencies(args: CliOptions) {
 * TODO: Think about moving all config here ?
 */
 export async function initConfiguration(args: CliOptions) {
+	const configDir = getNatConfig();
+	if (existsSync(configDir)) {
+		logger.warn("Config file already exists, skipping. If you wish to reconfigure, please delete the config file and run init again");
+		return;
+	}
+
 	const repoAnswers = await inquirer.prompt([
 		{
 			name: "url",
@@ -155,7 +161,6 @@ export async function initConfiguration(args: CliOptions) {
 
 	]);
 
-	const configDir = getNatConfig();
 	const config = {
 		repo: repoAnswers
 	};
