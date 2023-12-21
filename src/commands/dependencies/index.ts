@@ -1,21 +1,59 @@
 import { dirname, join } from "path";
 import { CliOptions } from "../../arguments.js";
-import { Artifact, MAVEN_METADATA_FILE_NAME, downloadArtifact, downloadMavenMetadata, getPackageNameFromArtifactData, parsePomFile } from "../../helpers/maven/artifact.js";
+import { Artifact, downloadArtifact, downloadMavenMetadata, getPackageNameFromArtifactData, parsePomFile } from "../../helpers/maven/artifact.js";
 import targz from "targz";
 import logger from "../../logger/logger.js";
-import { copyFile, cp, mkdir, rm } from "fs/promises";
+import { copyFile, cp, mkdir, readFile, rm } from "fs/promises";
 import { promisify } from "util";
-import { existsSync, readFileSync } from "fs";
+import { existsSync, readFileSync, writeFileSync } from "fs";
 const untar = promisify(targz.decompress);
 import { parseStringPromise } from 'xml2js';
+
+/**
+* Map of mvn environment variables
+*/
+interface EnvironmentVariables {
+	[key: string]: string;
+}
 
 /**
 * Given an artifact with defined dependencies, fetches nested dependencies and then extracts them to the correct place
 */
 export async function fetchDependencies(args: CliOptions, artifact: Artifact) {
-	await populateArtifactDependencies(args, artifact);
+	const envVariables = await fetchEnvironmentVariables().catch(() => { return {}; });
+	await populateArtifactDependencies(args, artifact, envVariables);
 	await fetchArtifactDependencies(args, artifact);
 	await fetchBtvaTypes(args);
+	await fetchExtraPackages(args);
+}
+
+export async function fetchExtraPackages(args: CliOptions) {
+	await Promise.all(
+		[
+			{
+				artifactid: "vro-scripting-api",
+				groupid: "com.vmware.pscoe.iac",
+			}
+		]
+
+			.map(artifact => new Promise<void>(async (resolve) => {
+
+				const type = {
+					artifactid: artifact.artifactid,
+					groupid: artifact.groupid,
+					version: args.btvaVersion,
+					type: "tgz"
+				};
+
+				try {
+					const artifactLocation = await downloadArtifact(type);
+					await handleNormalArtifacts(artifactLocation, type);
+				}
+				catch (error) {
+					logger.warn(`Skipping... Could not download ${artifact.artifactid}, reason: ${error}`);
+				}
+				resolve();
+			})));
 }
 
 /**
@@ -53,6 +91,7 @@ export async function fetchBtvaTypes(args: CliOptions) {
 			"o11n-plugin-xml",
 			"tslib",
 			"vrotsc-annotations",
+			"@vmware-pscoe/vro-scripting-api"
 		]
 			.map(artifactName => new Promise<void>(async (resolve) => {
 				const type = {
@@ -112,21 +151,72 @@ export async function findPomVersion(dependency: Artifact) {
 }
 
 /**
+* Will try to find the mvn environment variables in the current working directory and 2 levels up.
+* Will parse the first .mvn/jvm.config file it finds and return the environment variables
+*/
+export async function fetchEnvironmentVariables(): Promise<EnvironmentVariables> {
+	const cwd = process.cwd();
+	const env: EnvironmentVariables = {};
+
+	for (const path of [cwd, join(cwd, ".."), join(cwd, "..", "..")]) {
+		const jvmConfigPath = join(path, ".mvn", "jvm.config");
+		if (existsSync(jvmConfigPath)) {
+			const fileData = await readFile(jvmConfigPath, 'utf8');
+
+			fileData.split('\n').forEach((line) => {
+				if (line.startsWith('-D')) {
+					const [key, value] = line.split('=');
+					env[key.substring(2)] = value;
+				}
+			});
+		}
+	}
+
+	return env;
+}
+
+/**
 * Populates the artifact with it's nested dependencies by fetching the maven-metadata.xml and parsing it
 */
-export async function populateArtifactDependencies(args: CliOptions, artifact: Artifact) {
+export async function populateArtifactDependencies(
+	args: CliOptions,
+	artifact: Artifact,
+	env: EnvironmentVariables,
+	alreadyParsed: { [key: string]: Artifact; } = {}
+) {
 	if (!artifact.dependencies) {
 		return;
 	}
+	logger.debug(`Populating dependencies for ${JSON.stringify(artifact)}`);
 
 	for (const index in artifact.dependencies) {
 		const dependency = artifact.dependencies[index];
-		let name: string = "";
+		const packageName = `${dependency.groupid}.${dependency.artifactid}`;
+
+		if (alreadyParsed[packageName]) {
+			dependency.name = alreadyParsed[packageName].name;
+			dependency.version = alreadyParsed[packageName].version;
+			dependency.dependencies = alreadyParsed[packageName].dependencies;
+			dependency.type = alreadyParsed[packageName].type;
+			dependency.artifactid = alreadyParsed[packageName].artifactid;
+			dependency.groupid = alreadyParsed[packageName].groupid;
+			continue;
+		}
+
 
 		try {
-			name = await findPomVersion(dependency);
+			dependency.name = await findPomVersion(dependency);
 		} catch (error) {
-			logger.verbose(`Could not download maven-metadata.xml for ${dependency.artifactid}, reason: ${error}. Trying pom.xml instead`);
+			// logger.verbose(`Cou/* l */d not download maven-metadata.xml for ${dependency.artifactid}, reason: ${error}. Trying pom.xml instead`);
+		}
+
+		if (dependency?.version?.startsWith("${")) {
+			const envVariable = dependency.version.substring(2, dependency.version.length - 1);
+			dependency.version = env[envVariable];
+		}
+
+		if (dependency.artifactid == "vro" && dependency.groupid == "com.vmware.pscoe.ts") {
+			continue;
 		}
 
 		const depPom = await downloadArtifact({
@@ -134,15 +224,20 @@ export async function populateArtifactDependencies(args: CliOptions, artifact: A
 			groupid: dependency.groupid,
 			version: dependency.version,
 			// If we found a pom version, use that, otherwise use the default
-			name: name,
+			name: dependency.name,
 			type: "pom"
 		});
 
 		const depArtifact = await parsePomFile(depPom);
-		dependency.dependencies = depArtifact.dependencies;
+		//@ts-ignore
+		dependency.dependencies = Array.isArray(depArtifact.dependencies)
+			? depArtifact.dependencies
+			: !depArtifact.dependencies ? [] : [depArtifact.dependencies];
 		if (dependency.dependencies) {
-			await populateArtifactDependencies(args, dependency);
+			await populateArtifactDependencies(args, dependency, env, alreadyParsed);
 		}
+
+		alreadyParsed[packageName] = dependency;
 	}
 }
 
@@ -153,7 +248,10 @@ export async function fetchArtifactDependencies(args: CliOptions, artifact: Arti
 	const dependencyMap = getLatestDependencies(artifact);
 	// Convert the Map to an array of Artifact objects
 	const latestDependencies: Artifact[] = Array.from(dependencyMap.values());
-	Promise.all(latestDependencies.map((dependency) => new Promise<void>(async (resolve) => {
+
+	for (const dependency of latestDependencies) {
+		logger.debug(`Fetching ${JSON.stringify(dependency)}`);
+
 		const artifactLocation = await downloadArtifact(dependency);
 		if (dependency.type == "tgz") {
 			await handleTypeDefs(artifactLocation, dependency);
@@ -162,8 +260,7 @@ export async function fetchArtifactDependencies(args: CliOptions, artifact: Arti
 		if (dependency.type == "package") {
 			await handlePackages(args, artifactLocation, dependency);
 		}
-		resolve();
-	})));
+	}
 }
 
 /**
@@ -177,6 +274,10 @@ async function handlePackages(args: CliOptions, artifactLocation: string, artifa
 
 	if (!existsSync(dir))
 		await mkdir(dir, { recursive: true });
+	else {
+		logger.debug(`Skipping ${artifactLocation} since it already exists`);
+		return;
+	}
 
 	await copyFile(artifactLocation, outDir);
 }
@@ -188,6 +289,38 @@ async function handlePackages(args: CliOptions, artifactLocation: string, artifa
 async function handleTypeDefs(artifactLocation: string, artifact: Artifact, overwriteName?: string) {
 	const name = overwriteName || `${artifact.groupid}.${artifact.artifactid}`;
 	const outDir = join(process.cwd(), "node_modules", "@types", name);
+
+	if (existsSync(outDir)) {
+		logger.debug(`Skipping ${artifactLocation} since it already exists`);
+		return;
+	}
+
+	logger.debug(`Decompressing ${artifactLocation} to ${outDir}`);
+	await untar({
+		src: artifactLocation,
+		dest: outDir
+	});
+
+	const packageFolderPath = join(outDir, 'package');
+
+	if (existsSync(packageFolderPath)) {
+		await cp(`${packageFolderPath}/`, outDir, { recursive: true });
+
+		await rm(packageFolderPath, { recursive: true });
+	}
+}
+
+/**
+* Handler for artifacts of type tgz that are NOT types
+*/
+async function handleNormalArtifacts(artifactLocation: string, artifact: Artifact, overwriteName?: string) {
+	const name = overwriteName || `${artifact.groupid}.${artifact.artifactid}`;
+	const outDir = join(process.cwd(), "node_modules", name);
+
+	if (existsSync(outDir)) {
+		logger.debug(`Skipping ${artifactLocation} since it already exists`);
+		return;
+	}
 
 	logger.debug(`Decompressing ${artifactLocation} to ${outDir}`);
 	await untar({
@@ -213,6 +346,10 @@ function getLatestDependencies(artifact: Artifact): Map<string, Artifact> {
 	function traverseDependencies(artifact: Artifact): void {
 		const { version, dependencies } = artifact;
 		const key = getPackageNameFromArtifactData(artifact);
+
+		if (artifact.version.startsWith("${")) {
+			return;
+		}
 
 		if (!dependencyMap.has(key) || dependencyMap.get(key)!.version < version) {
 			dependencyMap.set(key, artifact);

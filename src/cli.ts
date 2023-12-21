@@ -10,7 +10,6 @@ export default async function() {
 
 	logger.level = args.verbosity;
 
-
 	if (args.version)
 		await versionCmd(args);
 

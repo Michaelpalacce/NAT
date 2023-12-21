@@ -16,6 +16,7 @@ import { fetchDependencies } from "./commands/dependencies/index.js";
 import { join, dirname } from "path";
 
 import { fileURLToPath } from 'url';
+import { rmdir } from "fs/promises";
 
 /**
 * Display the version to the user
@@ -65,6 +66,7 @@ export async function cleanCmd(args: CliOptions) {
 
 /**
 * Fetches project dependencies.
+* Will delete the node_modules folder and then fetch all the dependencies from the artifact.
 * This will download both `.package` files and `.tgz`files.
 * - `.package` - puts them in the NAT out dir.
 * - `.tgz` - extracts them and puts them in the node_modules folder
@@ -72,6 +74,10 @@ export async function cleanCmd(args: CliOptions) {
 export async function dependenciesCmd(args: CliOptions) {
 	logger.verbose("Dependencies");
 	const start = Date.now();
+
+	if (existsSync(join(process.cwd(), "node_modules")))
+		await rmdir(join(process.cwd(), "node_modules"), { recursive: true });
+
 	const artifactData: Artifact = await fetchProjectArtifactData(process.cwd());
 
 	await fetchDependencies(args, artifactData);
