@@ -166,15 +166,11 @@ export async function watchCmd(args: CliOptions) {
 //////////////////////////////// PRIVATE ///////////////////////////////////////
 
 /**
-* Runs vrotsc that compiles the TS code to JS, will clean up the outFolder if files are not given
+* Runs vrotsc that compiles the TS code to JS
 * Fetches artifact data, stores it in a lock file and returns it. Alternatively if the lock file exists, fetches it from there
 */
 async function vrotscCmd(args: CliOptions) {
 	const artifactData: Artifact = await fetchProjectArtifactData(process.cwd());
-
-	if (!args.files) {
-		await cleanCmd(args);
-	}
 
 	// Runs vrotsc to transpile TS code
 	await vrotsc(args, artifactData);
