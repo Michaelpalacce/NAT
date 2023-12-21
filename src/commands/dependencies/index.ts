@@ -28,6 +28,9 @@ export async function fetchDependencies(args: CliOptions, artifact: Artifact) {
 	await fetchExtraPackages(args);
 }
 
+/**
+* This is needed because of vrotest
+*/
 export async function fetchExtraPackages(args: CliOptions) {
 	await Promise.all(
 		[
@@ -247,18 +250,18 @@ export async function populateArtifactDependencies(
 export async function fetchArtifactDependencies(args: CliOptions, artifact: Artifact) {
 	const dependencyMap = getLatestDependencies(artifact);
 	// Convert the Map to an array of Artifact objects
-	const latestDependencies: Artifact[] = Array.from(dependencyMap.values());
 
-	for (const dependency of latestDependencies) {
-		logger.debug(`Fetching ${JSON.stringify(dependency)}`);
+	for (const key in dependencyMap) {
+		const latestDependencies = Object.values(dependencyMap[key]);
+		for (const dependency of latestDependencies) {
+			const artifactLocation = await downloadArtifact(dependency);
+			if (dependency.type == "tgz") {
+				await handleTypeDefs(artifactLocation, dependency);
+			}
 
-		const artifactLocation = await downloadArtifact(dependency);
-		if (dependency.type == "tgz") {
-			await handleTypeDefs(artifactLocation, dependency);
-		}
-
-		if (dependency.type == "package") {
-			await handlePackages(args, artifactLocation, dependency);
+			if (dependency.type == "package") {
+				await handlePackages(args, artifactLocation, dependency);
+			}
 		}
 	}
 }
@@ -307,37 +310,10 @@ async function handleTypeDefs(artifactLocation: string, artifact: Artifact, over
 }
 
 /**
-* Handler for artifacts of type tgz that are NOT types
-*/
-async function handleNormalArtifacts(artifactLocation: string, artifact: Artifact, overwriteName?: string) {
-	const name = overwriteName || `${artifact.groupid}.${artifact.artifactid}`;
-	const outDir = join(process.cwd(), "node_modules", name);
-
-	if (existsSync(outDir)) {
-		logger.debug(`Skipping ${artifactLocation} since it already exists`);
-		return;
-	}
-
-	logger.debug(`Decompressing ${artifactLocation} to ${outDir}`);
-	await untar({
-		src: artifactLocation,
-		dest: outDir
-	});
-
-	const packageFolderPath = join(outDir, 'package');
-
-	if (existsSync(packageFolderPath)) {
-		await cp(`${packageFolderPath}/`, outDir, { recursive: true });
-
-		await rm(packageFolderPath, { recursive: true });
-	}
-}
-
-/**
 * Converts a dep tree to a flat structure with only latest versions
 */
-function getLatestDependencies(artifact: Artifact): Map<string, Artifact> {
-	const dependencyMap = new Map<string, Artifact>();
+function getLatestDependencies(artifact: Artifact): { [key: string]: { [key: string]: Artifact; }; } {
+	const dependencyMap = {};
 
 	function traverseDependencies(artifact: Artifact): void {
 		const { version, dependencies } = artifact;
@@ -347,8 +323,17 @@ function getLatestDependencies(artifact: Artifact): Map<string, Artifact> {
 			return;
 		}
 
-		if (!dependencyMap.has(key) || dependencyMap.get(key)!.version < version) {
-			dependencyMap.set(key, artifact);
+		const artType = artifact?.type;
+
+		if (typeof artType == "undefined") {
+			return;
+		}
+
+		if (!dependencyMap[key] || (dependencyMap?.[key]?.[artType]?.version < version)) {
+			if (!dependencyMap[key]) {
+				dependencyMap[key] = {};
+			}
+			dependencyMap[key][artifact.type] = artifact;
 		}
 
 		if (!dependencies) {

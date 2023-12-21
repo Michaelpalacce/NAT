@@ -25,7 +25,8 @@ export default async function(args: CliOptions, artifactData: Artifact) {
 		'--configurations', `${outFolder}/vro-sources/xml/src/main/resources/ConfigurationElement`,
 		'--ts-src', `src`,
 		'--ts-namespace', namespace,
-		'--dependencies', `${outFolder}/dependency`,
+		'--dependencies', `target/dependency/vro`, // @TODO FIX THIS LATER ON WHEN WE CAN DOWNLOAD DEPENDENCIES
+		// '--dependencies', `${outFolder}/dependency`,
 		'--helpers', 'node_modules/@vmware-pscoe/vro-scripting-api/lib',
 		'--output', `${outFolder}/vro-tests`,
 	]);
