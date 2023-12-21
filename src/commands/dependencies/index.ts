@@ -5,9 +5,10 @@ import targz from "targz";
 import logger from "../../logger/logger.js";
 import { copyFile, cp, mkdir, readFile, rm } from "fs/promises";
 import { promisify } from "util";
-import { existsSync, readFileSync, writeFileSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 const untar = promisify(targz.decompress);
 import { parseStringPromise } from 'xml2js';
+import { execSync } from "child_process";
 
 /**
 * Map of mvn environment variables
@@ -47,7 +48,7 @@ export async function fetchExtraPackages(args: CliOptions) {
 
 				try {
 					const artifactLocation = await downloadArtifact(type);
-					await handleNormalArtifacts(artifactLocation, type);
+					execSync(`npm install ${artifactLocation}`);
 				}
 				catch (error) {
 					logger.warn(`Skipping... Could not download ${artifact.artifactid}, reason: ${error}`);
@@ -91,7 +92,6 @@ export async function fetchBtvaTypes(args: CliOptions) {
 			"o11n-plugin-xml",
 			"tslib",
 			"vrotsc-annotations",
-			"@vmware-pscoe/vro-scripting-api"
 		]
 			.map(artifactName => new Promise<void>(async (resolve) => {
 				const type = {
@@ -274,10 +274,6 @@ async function handlePackages(args: CliOptions, artifactLocation: string, artifa
 
 	if (!existsSync(dir))
 		await mkdir(dir, { recursive: true });
-	else {
-		logger.debug(`Skipping ${artifactLocation} since it already exists`);
-		return;
-	}
 
 	await copyFile(artifactLocation, outDir);
 }
